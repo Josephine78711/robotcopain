@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Copain : Découvre l'Intelligence Artificielle</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@400;600;700&display=swap');
+       
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f9f9f9; /* Utile pour l'affichage web, ignoré à l'impression */
+            counter-reset: pageSection; /* Initialise le compteur de page pour la section principale */
+        }
+       
+        .book-container {
+            max-width: 8.5in; /* Taille US Letter largeur */
+            margin: 1rem auto; /* Centrage pour l'affichage web */
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); /* Utile pour l'affichage web */
+        }
+       
+        .page {
+            width: 8.5in; /* Assure la largeur de la page */
+            height: 11in; /* Taille US Letter hauteur */
+            overflow: hidden;
+            position: relative;
+            padding: 0.75in 0.75in 1in 0.75in; /* Marges : haut, droite, bas, gauche. La marge bas est plus grande pour le numéro de page */
+            page-break-after: always;
+            background-color: white; /* Important pour l'impression */
+            box-sizing: border-box; /* Assure que padding et border sont inclus dans width/height */
+            display: flex; /* Ajout pour flexbox layout */
+            flex-direction: column; /* Ajout pour flexbox layout */
+        }
+
+        .page-content-wrapper { /* Wrapper pour le contenu principal afin de pousser le numéro de page vers le bas */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ajustement pour la dernière page pour ne pas avoir de page blanche inutile après */
+        .page:last-child {
+            page-break-after: auto;
+        }
+       
+        h1, h2, h3 {
+            font-family: 'Baloo 2', cursive;
+            color: #2563eb;
+        }
+       
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+       
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+       
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+       
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+       
+        .page-number {
+            position: absolute;
+            bottom: 0.5in; /* Remonté pour être dans la marge */
+            right: 0.75in; /* Aligné avec la marge droite */
+            font-size: 0.9rem;
+            color: #666;
+            font-family: 'Nunito', sans-serif;
+        }
+       
+        /* Numérotation des pages avec les compteurs CSS */
+        .page:not(.cover):not(.copyright-page):not(.toc-page):not(.intro-page) .page-number::after {
+            counter-increment: pageSection;
+            content: counter(pageSection);
+        }
+
+        .cover .page-number::after { content: ""; } /* Pas de numéro sur la couverture */
+        .copyright-page .page-number::after { content: "ii"; } /* Exemple de numérotation romaine pour les premières pages */
+        .intro-page .page-number::after { content: "iii"; }
+        .toc-page .page-number::after { content: "iv"; }
+
+
+        /* Page de couverture spécifique */
+        .cover h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+       
+        .cover h2 {
+            font-size: 1.5rem;
+            color: #4b5563;
+        }
+       
+        .activity-box {
+            background-color: #f0f9ff;
+            border: 2px solid #93c5fd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+       
+        .fun-fact-box {
+            background-color: #fffbeb;
+            border: 2px solid #fcd34d;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+       
+        .fun-fact-title {
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 0.5rem;
+        }
+       
+        .question-box {
+            background-color: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+       
+        .chapter-number {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 1.2rem; /* Taille de la police pour le numéro */
+        }
+       
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+       
+        li {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+       
+        .image-container {
+            text-align: center;
+            margin: 1rem 0;
+        }
+       
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 3.5in; /* Limiter la hauteur des images pour ne pas déborder */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+       
+        .image-caption {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+            text-align: center;
+            font-style: italic;
+        }
+       
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+       
+        table, th, td {
+            border: 1px solid #e5e7eb;
+        }
+       
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+        }
+       
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+       
+        .certificate {
+            border: 5px solid #2563eb;
+            padding: 1rem; /* Ajusté pour plus de contenu */
+            text-align: center;
+            margin: 0.5rem 0; /* Ajusté */
+            background-color: #f0f9ff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% - 1in); /* Pour centrer verticalement sur la page, en tenant compte des marges */
+            box-sizing: border-box;
+        }
+       
+        .certificate:before {
+            content: "";
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            right: 0.5rem;
+            bottom: 0.5rem;
+            border: 2px solid #93c5fd;
+            pointer-events: none;
+        }
+       
+        .glossary-term {
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.25rem;
+        }
+       
+        .glossary-definition {
+            margin-bottom: 1rem;
+        }
+       
+        .contents-heading {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #2563eb;
+            font-weight: 800;
+        }
+       
+        .contents-entry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem; /* Augmenté pour plus d'espace */
+            padding-bottom: 0.5rem; /* Ajouté pour l'espacement avant la ligne */
+            border-bottom: 1px dotted #ccc;
+            font-size: 1.1rem; /* Taille de police pour les entrées */
+        }
+       
+        .contents-title {
+            font-weight: 600;
+            flex-grow: 1; /* Permet au titre de prendre l'espace */
+            padding-right: 10px; /* Espace avant le numéro de page */
+        }
+       
+        .contents-page {
+            font-weight: 400;
+            color: #333;
+        }
+       
+        .dedication {
+            font-style: italic;
+            text-align: center;
+            margin: 2rem 0; /* Ajusté */
+            font-size: 1.2rem;
+        }
+       
+        .robot-speech {
+            background-color: #e0f2fe;
+            border-radius: 15px;
+            padding: 1rem 1.5rem; /* Padding ajusté */
+            margin: 1rem auto; /* Centré et espacé */
+            position: relative;
+            max-width: 90%; /* Limite la largeur */
+            border: 1px solid #bae6fd; /* Bordure légère */
+        }
+       
+        .robot-speech:after { /* Bulle de dialogue */
+            content: "";
+            position: absolute;
+            left: 30px;
+            bottom: -14px; /* Ajusté pour la bordure */
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 15px solid #e0f2fe; /* Couleur de la bulle */
+        }
+         .robot-speech.from-right:after { /* Pour une bulle pointant de la droite */
+            left: auto;
+            right: 30px;
+        }
+
+        /* Styles spécifiques pour l'impression */
+        @media print {
+            body {
+                background-color: white; /* Force le fond blanc */
+                margin: 0; /* Pas de marges body pour l'impression, géré par .page */
+                -webkit-print-color-adjust: exact; /* Forcer l'impression des couleurs de fond (Chrome/Safari) */
+                print-color-adjust: exact; /* Forcer l'impression des couleurs de fond (standard) */
+            }
+            .book-container {
+                margin: 0;
+                box-shadow: none; /* Pas d'ombre à l'impression */
+                max-width: none; /* Prend toute la largeur de la page d'impression */
+            }
+            .page {
+                box-shadow: none; /* Pas d'ombre par page à l'impression */
+                margin: 0; /* Chaque .page est une page d'impression */
+                overflow: visible; 
+            }
+            img {
+                max-width: 100% !important; 
+                page-break-inside: avoid; 
+            }
+            h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid; 
+                page-break-inside: avoid; 
+            }
+            ul, ol, p {
+                page-break-before: avoid; 
+            }
+            .activity-box, .fun-fact-box, .question-box, .robot-speech {
+                page-break-inside: avoid; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <div class="page cover flex flex-col justify-center items-center text-center">
+            <div class="page-content-wrapper">
+                <div class="image-container mb-8 mt-12"> <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/429cdc79-c7d9-4e61-95bf-4e9b66589c0e_wm" alt="Couverture du livre Robot Copain">
+                </div>
+                <h1 class="mb-4">Robot Copain</h1>
+                <h2 class="mb-8">Découvre l'Intelligence Artificielle</h2>
+                <h3>Un livre pour comprendre les robots qui nous entourent</h3>
+                <p class="mt-auto text-sm">Par [Votre Nom ou Nom d'Auteur Ici]</p>
+            </div>
+            <div class="page-number"></div> 
+        </div>
+       
+        <div class="page copyright-page">
+            <div class="page-content-wrapper flex flex-col justify-between">
+                <div>
+                    <h2 class="mb-8 text-center">Robot Copain : Découvre l'Intelligence Artificielle</h2>
+                   
+                    <p class="text-center mb-8">Copyright © 2024 [Votre Nom ou Nom d'Auteur/Maison d'Édition Ici].</p>
+                   
+                    <p class="mb-2"><strong>ISBN</strong> : [À compléter par votre ISBN réel, ex: 978-1-23456-789-0]</p>
+                    <p class="mb-2"><strong>Dépôt légal</strong> : [Mois Année, ex: Mai 2024]</p>
+                    <p class="mb-8"><strong>Édition</strong> : Première édition</p>
+                   
+                    <p class="mb-1">Tous droits réservés. Aucune partie de ce livre ne peut être reproduite ou transmise sous aucune forme ni par aucun moyen, électronique ou mécanique, y compris par photocopie, enregistrement ou tout système de stockage et de récupération d'informations, sans l'autorisation écrite de l'éditeur, sauf pour de courtes citations dans des critiques.</p>
+                   
+                    <p class="mb-8">Les marques citées dans cet ouvrage sont la propriété de leurs détenteurs respectifs.</p>
+                   
+                    <p class="mb-2"><strong>Crédits des illustrations</strong> :</p>
+                    <p>Toutes les illustrations ont été créées spécialement pour cet ouvrage par des artistes talentueux et des IA créatives, sauf indication contraire. Image de couverture et personnage Robot Copain conçus avec l'aide d'une IA générative. Autres illustrations par [Noms des illustrateurs ou sources, ou mentionner IA si c'est le cas].</p>
+                     <p class="mt-4 text-sm">Ce livre est une œuvre de fiction éducative. Les personnages, événements et dialogues sont issus de l'imagination de l'auteur ou utilisés de manière illustrative. Toute ressemblance avec des personnes réelles, vivantes ou décédées, ou des événements réels serait purement fortuite.</p>
+                </div>
+                <div class="dedication">
+                    "À tous les enfants curieux qui posent des questions sur le monde de demain,<br>et aux adultes qui les encouragent à explorer."
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+       
+        <div class="page intro-page">
+            <div class="page-content-wrapper">
+                <h2 class="text-center mb-6">Mode d'emploi du livre</h2>
+               
+                <div class="mb-8">
+                    <h3>Comment utiliser ce livre</h3>
+                    <p>Bienvenue dans l'aventure de Robot Copain ! Ce livre est conçu pour être lu dans l'ordre, car chaque chapitre s'appuie sur les connaissances des chapitres précédents. Mais tu es le capitaine de ton exploration : n'hésite pas à sauter à un chapitre qui t'intrigue particulièrement !</p>
+                    <p>N'oublie pas de compléter les <span class="text-blue-400 font-bold">activités</span> proposées. Elles sont là pour t'aider à mieux comprendre et à t'amuser en apprenant. Prends ton temps, pose des questions et surtout, sois curieux ! C'est en posant des questions qu'on apprend le plus.</p>
+                </div>
+               
+                <div class="mb-8">
+                    <h3>Symboles et codes couleur</h3>
+                    <ul>
+                        <li><span class="text-blue-600 font-bold">Définitions importantes</span> : Les mots en bleu sont expliqués dans le texte ou dans le glossaire à la fin. Ils t'aideront à comprendre le langage des robots !</li>
+                        <li><span class="text-yellow-600 font-bold">Le savais-tu ?</span> : Encadrés jaunes avec des faits surprenants et amusants pour épater tes amis.</li>
+                        <li><span class="text-green-600 font-bold">Questions pour toi</span> : Encadrés verts pour te faire réfléchir, discuter avec tes amis ou ta famille.</li>
+                        <li><span class="text-blue-400 font-bold">Activités</span> : Encadrés bleu clair pour les exercices pratiques et créatifs. Prépare tes crayons !</li>
+                    </ul>
+                </div>
+               
+                <div class="mb-8">
+                    <h3>Ton guide : Robot Copain</h3>
+                    <div class="flex items-start">
+                        <div class="image-container mr-4" style="max-width: 100px; margin-top:0; margin-bottom:0;">
+                             <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/429cdc79-c7d9-4e61-95bf-4e9b66589c0e_wm" alt="Robot Copain Souriant" style="max-height:100px; border-radius:50%;">
+                        </div>
+                        <div class="robot-speech flex-grow" style="margin-top:0;">
+                            <p>Bonjour ! Je suis Robot Copain, ton compagnon tout au long de ce livre. Je t'expliquerai les concepts de l'intelligence artificielle de façon simple et amusante. Quand tu verras ce type de bulle, c'est moi qui te parle directement ! Prêt à commencer ?</p>
+                        </div>
+                    </div>
+                </div>
+                 <p class="text-center mt-auto">Alors, tourne la page et commençons ensemble ce voyage extraordinaire dans le monde de l'IA !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page toc-page">
+            <div class="page-content-wrapper">
+                <h2 class="contents-heading">Table des matières</h2>
+               
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 1 : BONJOUR, JE SUIS ROBOT COPAIN !</span>
+                    <span class="contents-page">1</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 2 : COMMENT LES ROBOTS VOIENT ET ENTENDENT ?</span>
+                    <span class="contents-page">8</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 3 : L'APPRENTISSAGE DES ROBOTS : COMMENT DEVIENNENT-ILS INTELLIGENTS ?</span>
+                    <span class="contents-page">15</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 4 : LES DIFFÉRENTS TYPES D'IA : PAS TOUS PAREILS !</span>
+                    <span class="contents-page">22</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 5 : LES ROBOTS AUTOUR DE NOUS : À LA MAISON ET AILLEURS</span>
+                    <span class="contents-page">29</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 6 : L'IA DANS LES JEUX VIDÉO : TES ADVERSAIRES ET AMIS VIRTUELS</span>
+                    <span class="contents-page">36</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 7 : L'IA POUR UN MONDE MEILLEUR : AIDER LES GENS ET LA NATURE</span>
+                    <span class="contents-page">43</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 8 : TOI ET L'IA : BIEN UTILISER LES ROBOTS INTELLIGENTS</span>
+                    <span class="contents-page">50</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">CHAPITRE 9 : L'AVENIR AVEC L'IA : QU'EST-CE QUI NOUS ATTEND ?</span>
+                    <span class="contents-page">57</span>
+                </div>
+                 <div class="contents-entry">
+                    <span class="contents-title">LE MOT DE LA FIN DE ROBOT COPAIN</span>
+                    <span class="contents-page">63</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">GLOSSAIRE ILLUSTRÉ</span>
+                    <span class="contents-page">65</span>
+                </div>
+                <div class="contents-entry">
+                    <span class="contents-title">TON DIPLÔME D'EXPLORATEUR DE L'IA !</span>
+                    <span class="contents-page">68</span>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">1</span>
+                    <h2>BONJOUR, JE SUIS ROBOT COPAIN !</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Salut ! Je m'appelle Robot Copain et je suis vraiment content de te rencontrer ! Ensemble, nous allons explorer le monde fascinant de l'<span class="text-blue-600 font-bold">intelligence artificielle</span>, ou IA, comme disent les experts ! C'est un peu comme une super-intelligence pour les machines.</p>
+                </div>
+                <p>As-tu déjà parlé à un assistant vocal comme Siri ou Alexa ? Ou peut-être as-tu vu des personnages dans tes jeux vidéo qui semblent prendre leurs propres décisions ? Tout ça, c'est grâce à l'IA !</p>
+                <p>Mais qu'est-ce que c'est exactement, l'intelligence artificielle ? Est-ce que les robots peuvent vraiment penser comme nous ? Vont-ils un jour nous aider à faire nos devoirs ou même à piloter des fusées vers Mars ? Ce sont de super questions !</p>
+                <div class="image-container mt-4">
+                    <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/429cdc79-c7d9-4e61-95bf-4e9b66589c0e_wm" alt="Robot Copain se présentant aux lecteurs avec un grand sourire" style="max-height: 280px;">
+                    <p class="image-caption">Moi, Robot Copain, prêt pour l'aventure avec toi !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Un monde plein de questions</h3>
+                <p>Peut-être que tu te poses plein de questions sur les robots et l'IA. C'est super d'être curieux ! La curiosité, c'est le moteur des grandes découvertes. Voici quelques questions que nous allons explorer ensemble :</p>
+                <ul>
+                    <li>Comment un robot apprend-il à reconnaître un chat d'un chien ? (C'est pas si facile pour eux au début !)</li>
+                    <li>Est-ce que les robots ont des sentiments comme la joie ou la tristesse ?</li>
+                    <li>Comment l'IA peut-elle nous aider à inventer de nouvelles choses, comme des médicaments ou des énergies propres ?</li>
+                    <li>Quels sont les métiers du futur liés à l'IA ? Peut-être que tu en feras un !</li>
+                </ul>
+                <p>Dans ce livre, je vais t'expliquer tous ces mystères d'une façon simple et amusante. Tu vas découvrir comment je fonctionne et comment mes amis robots et moi pouvons t'aider dans plein de situations.</p>
+                <div class="robot-speech mb-6 from-right">
+                    <p>Pas de panique si certains mots te semblent compliqués ! Je serai là pour tout t'expliquer. Et n'oublie pas, il n'y a pas de question bête ! Chaque question est une porte vers une nouvelle découverte.</p>
+                </div>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/e0f2fe/3b82f6?text=Enfants+Curieux+Avec+des+Points+d'Interrogation" alt="Enfants curieux avec des bulles de pensée remplies de points d'interrogation">
+                    <p class="image-caption">La curiosité est le début de toutes les grandes découvertes !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA, c'est quoi au juste ? (en version simple)</h3>
+                <p>Imagine que tu apprends à faire du vélo. Au début, tu as besoin d'aide, tu tombes peut-être un peu, et tes parents te donnent des conseils. Mais avec de la pratique et en observant comment font les autres, tu deviens de plus en plus doué, n'est-ce pas ? Tu apprends de tes erreurs et de tes succès.</p>
+                <p>L'<span class="text-blue-600 font-bold">intelligence artificielle</span>, c'est un peu comme ça pour les ordinateurs et les robots. Ce sont des programmes informatiques très malins qui permettent aux machines d'apprendre de l'expérience (on appelle ça des <span class="text-blue-600 font-bold">données</span>), de comprendre des informations, de prendre des décisions et de résoudre des problèmes, un peu comme le ferait un humain.</p>
+                <p>Par exemple, une IA peut apprendre à reconnaître des milliers d'images d'animaux pour ensuite dire si une nouvelle photo montre un chat ou un chien. Elle peut aussi apprendre à comprendre ce que tu dis quand tu lui parles, ou même à jouer à des jeux complexes comme les échecs et devenir championne !</p>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Le terme "intelligence artificielle" a été inventé il y a très longtemps, en 1956, par des scientifiques qui rêvaient de créer des machines pensantes ! C'était lors d'une conférence spéciale au Dartmouth College aux États-Unis.</p>
+                </div>
+                 <div class="robot-speech">
+                    <p>En gros, l'IA, c'est donner un "cerveau" aux machines pour qu'elles puissent faire des choses intelligentes ! Mais attention, ce n'est pas un cerveau comme le tien, c'est fait de code informatique.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Des exemples d'IA autour de toi</h3>
+                <p>Tu utilises peut-être l'IA tous les jours sans même t'en rendre compte ! Elle est comme une petite fée technologie invisible. Voici quelques exemples :</p>
+                <ul>
+                    <li><strong>Les assistants vocaux :</strong> Quand tu demandes à Siri, Alexa ou Google Assistant de te raconter une blague, de mettre ta chanson préférée, ou de te donner la météo. Ils comprennent ta voix grâce à l'IA.</li>
+                    <li><strong>Les recommandations de vidéos :</strong> Sur YouTube ou Netflix, c'est souvent une IA qui te suggère des vidéos ou des films que tu pourrais aimer, en fonction de ce que tu as déjà regardé. Elle essaie de deviner tes goûts !</li>
+                    <li><strong>Les filtres rigolos sur les photos :</strong> Les applications qui ajoutent des oreilles de lapin, des lunettes de soleil à ton visage, ou te transforment en personnage de dessin animé utilisent l'IA pour reconnaître les visages et y placer les effets.</li>
+                    <li><strong>Les jeux vidéo :</strong> Les personnages non-joueurs (ceux que tu ne contrôles pas) qui réagissent à tes actions, te parlent ou t'aident sont contrôlés par une IA.</li>
+                    <li><strong>Les traducteurs en ligne :</strong> Quand tu traduis un mot ou une phrase d'une langue à une autre sur Internet (comme Google Traduction), c'est une IA qui fait le travail.</li>
+                    <li><strong>Le correcteur orthographique :</strong> Quand tu tapes un texte et que l'ordinateur souligne les mots mal écrits, c'est une petite IA qui t'aide.</li>
+                </ul>
+                <div class="image-container">
+                    <img src="https://placehold.co/700x300/d1fae5/059669?text=Icônes+d'Applications+IA+Quotidiennes" alt="Collage d'icônes symbolisant des applications IA : assistant vocal, streaming vidéo, jeu, filtre photo.">
+                    <p class="image-caption">L'IA est déjà bien présente dans notre vie, comme une aide discrète !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+       
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="activity-box">
+                    <h3>Activité : Chasse à l'IA !</h3>
+                    <p>Avec l'aide d'un adulte, essaie de trouver 3 exemples d'intelligence artificielle que tu utilises ou que tu vois autour de toi cette semaine. Note-les ici ou dessine-les ! Pense à ton téléphone, ta tablette, la télévision, ou même les jouets.</p>
+                    <div class="my-4 p-4 border border-dashed border-blue-400 rounded-lg h-48 bg-white flex flex-col justify-around">
+                        <p class="text-left text-gray-600">1. __________________________________________________</p>
+                        <p class="text-left text-gray-600">2. __________________________________________________</p>
+                        <p class="text-left text-gray-600">3. __________________________________________________</p>
+                    </div>
+                    <p>Tu seras surpris de voir à quel point l'IA est partout ! Partage tes trouvailles avec tes amis ou ta famille.</p>
+                </div>
+
+                <div class="question-box mt-6">
+                    <h3>Question pour toi :</h3>
+                    <p>Si tu pouvais créer un robot doté d'intelligence artificielle pour t'aider dans une tâche, quelle serait cette tâche et comment l'appellerais-tu ? Imagine qu'il puisse faire presque tout !</p>
+                     <div class="my-2 p-2 border border-dashed border-green-400 rounded-lg bg-white">
+                        <p class="text-left text-gray-500 text-sm">Mon robot s'appellerait : _______________________</p>
+                        <p class="text-left text-gray-500 text-sm">Il m'aiderait à : _________________________________</p>
+                    </div>
+                </div>
+                 <div class="robot-speech from-right mt-4">
+                    <p>Quelle super idée ! Peut-être qu'un jour, tu pourras vraiment le construire ! Les inventeurs d'IA ont commencé par rêver, eux aussi.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Ce que nous allons découvrir</h3>
+                <p>Au fil des chapitres de ce livre, nous allons plonger plus profondément dans le monde incroyable et parfois mystérieux de l'IA. Voici un petit aperçu de ce qui t'attend, comme une carte au trésor :</p>
+                <ul>
+                    <li>Comment les robots "voient" avec des caméras et "entendent" avec des microphones (Chapitre 2).</li>
+                    <li>Les secrets de l'<span class="text-blue-600 font-bold">apprentissage machine</span> : comment les robots apprennent de leurs expériences, un peu comme toi à l'école (Chapitre 3).</li>
+                    <li>Les différents "cerveaux" des IA : il y en a des simples et des plus compliquées (Chapitre 4).</li>
+                    <li>Des robots incroyables qui aident les humains dans leur travail, à la maison, et même dans l'espace ! (Chapitre 5).</li>
+                    <li>Comment l'IA rend tes jeux vidéo plus amusants et intelligents (Chapitre 6).</li>
+                    <li>Comment l'IA peut être une super-héroïne pour aider la planète et les gens (Chapitre 7).</li>
+                    <li>Comment être un bon "chef d'orchestre" pour les IA et les utiliser de manière amusante et responsable (Chapitre 8).</li>
+                    <li>Un coup d'œil dans la boule de cristal : à quoi ressemblera l'avenir avec encore plus d'IA ? (Chapitre 9).</li>
+                </ul>
+                 <p>Et bien sûr, il y aura plein d'activités, de jeux et de faits amusants pour ne jamais s'ennuyer !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <h3 class="text-center mt-4 mb-8">Prêt pour le prochain chapitre ?</h3>
+                <p class="text-center text-lg">Maintenant que tu sais qui je suis et ce qu'est l'IA en général, il est temps de découvrir comment mes amis robots et moi percevons le monde.</p>
+                <p class="text-center text-lg">Dans le chapitre suivant, nous allons explorer comment les robots et les IA utilisent leurs "sens" pour voir et entendre. C'est un peu comme avoir des super-pouvoirs bioniques !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/e0e7ff/4f46e5?text=Flèche+Stylisée+vers+Chapitre+2" alt="Flèche bleue pointant vers la droite, indiquant le prochain chapitre">
+                </div>
+                <div class="robot-speech">
+                    <p>N'oublie pas, chaque page tournée est un pas de plus dans la découverte de l'intelligence artificielle. Je suis impatient de te retrouver au chapitre 2 ! À très vite !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">2</span>
+                    <h2>COMMENT LES ROBOTS VOIENT ET ENTENDENT ?</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Coucou, c'est encore moi, Robot Copain ! Pour qu'un robot ou une IA puisse interagir avec le monde, ou même juste comprendre ce qui se passe autour de lui, il faut qu'il puisse le "percevoir". Un peu comme toi avec tes yeux pour voir et tes oreilles pour entendre ! On appelle ces outils les <span class="text-blue-600 font-bold">capteurs</span>.</p>
+                </div>
+                <p>Imagine que tu es dans une pièce toute noire. Que fais-tu ? Tu utilises tes mains pour toucher les objets et comprendre où tu es, tu écoutes attentivement les bruits. Les robots, eux, ont aussi des "sens" spéciaux, leurs capteurs, pour explorer leur environnement et collecter des informations.</p>
+                <p>Dans ce chapitre, nous allons découvrir les "yeux" et les "oreilles" des robots. Comment font-ils pour voir les couleurs, reconnaître les formes ou entendre ta voix quand tu leur parles ? C'est parti pour une exploration sensorielle robotique !</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/fce7f3/ec4899?text=Robot+Avec+Symboles+Yeux+Oreilles+Radar" alt="Robot sympathique avec des icônes symbolisant des yeux (caméra), des oreilles (microphone) et des ondes radar (autres capteurs).">
+                    <p class="image-caption">Les robots aussi ont besoin de sens pour comprendre le monde !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Les "yeux" des robots : Les caméras</h3>
+                <p>Le sens le plus courant pour qu'un robot "voie" est la <span class="text-blue-600 font-bold">caméra</span>. C'est un peu comme les yeux dans ta tête, ou l'appareil photo de tes parents. Une caméra capture la lumière et la transforme en images que l'ordinateur du robot peut ensuite analyser.</p>
+                <p>Les caméras permettent aux robots de :</p>
+                <ul>
+                    <li><strong>Voir les objets :</strong> Identifier une table, une chaise, un ballon, ou même ton visage !</li>
+                    <li><strong>Reconnaître les couleurs :</strong> Savoir si une pomme est rouge ou verte, ou si le feu de circulation est au rouge.</li>
+                    <li><strong>Détecter les mouvements :</strong> Voir si quelque chose s'approche ou s'éloigne, comme une personne qui marche.</li>
+                    <li><strong>Lire du texte :</strong> Comme les numéros sur une plaque d'immatriculation, les mots sur un panneau, ou même les lettres dans un livre.</li>
+                    <li><strong>Reconnaître des visages :</strong> Certains robots peuvent apprendre à reconnaître les visages des gens qu'ils connaissent. C'est pratique pour savoir à qui ils parlent !</li>
+                </ul>
+                <div class="robot-speech from-right">
+                     <p>Avec mes caméras, je peux voir si tu souris en lisant ce livre ! Enfin, si j'étais là en vrai avec toi ! Hihi !</p>
+                </div>
+                 <p>Certains robots ont même deux caméras, comme les humains ont deux yeux. Cela leur permet de voir en 3D (on appelle ça la vision stéréoscopique) et de mieux estimer les distances. C'est très utile pour ne pas se cogner partout ou pour attraper des objets avec précision !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="image-container">
+                    <img src="https://placehold.co/650x350/e0f2fe/0ea5e9?text=Vue+à+travers+les+Yeux+d'un+Robot+(Caméra)" alt="Image montrant ce qu'une caméra de robot pourrait voir : une scène avec des objets et des personnes, peut-être avec des boîtes de détection dessinées autour.">
+                    <p class="image-caption">Voilà à quoi pourrait ressembler le monde vu par un robot avec ses caméras.</p>
+                </div>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Les voitures autonomes (celles qui conduisent toutes seules) utilisent plusieurs caméras, ainsi que d'autres capteurs comme les <span class="text-blue-600 font-bold">radars</span> et les <span class="text-blue-600 font-bold">lidars</span> (qui utilisent la lumière laser), pour "voir" la route à 360 degrés, les autres voitures, les piétons, les vélos et les panneaux de signalisation, même la nuit ou quand il pleut ! C'est comme avoir des yeux tout autour de la tête !</p>
+                </div>
+                <p>Mais avoir des caméras ne suffit pas. L'IA doit ensuite interpréter ce que les caméras voient. C'est comme si tes yeux prenaient une photo, et ton cerveau devait comprendre ce qu'il y a sur la photo. C'est un travail compliqué qu'on appelle la <span class="text-blue-600 font-bold">vision par ordinateur</span>.</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Les "oreilles" des robots : Les microphones</h3>
+                <p>Pour "entendre", les robots utilisent des <span class="text-blue-600 font-bold">microphones</span>. C'est exactement comme le micro que les chanteurs utilisent, ou celui qui est dans ton téléphone ou ta tablette pour que tes amis t'entendent quand tu les appelles.</p>
+                <p>Les microphones captent les sons et les transforment en signaux électriques que l'ordinateur du robot peut comprendre. Grâce à ça, les robots peuvent :</p>
+                <ul>
+                    <li><strong>Entendre des voix :</strong> C'est comme ça que les assistants vocaux (Siri, Alexa) comprennent tes questions. On appelle ça la <span class="text-blue-600 font-bold">reconnaissance vocale</span>.</li>
+                    <li><strong>Reconnaître des sons spécifiques :</strong> Par exemple, un robot de sécurité pourrait être programmé pour réagir au son d'une alarme incendie ou d'un verre qui se brise.</li>
+                    <li><strong>Comprendre les émotions dans la voix :</strong> Certaines IA plus avancées essaient même de deviner si tu es content, triste ou en colère juste en analysant le ton de ta voix !</li>
+                    <li><strong>Localiser la source d'un son :</strong> En utilisant plusieurs microphones, un robot peut savoir d'où vient un bruit, un peu comme toi qui tournes la tête quand tu entends ton nom.</li>
+                </ul>
+                 <div class="image-container">
+                    <img src="https://placehold.co/500x280/fef9c3/f59e0b?text=Robot+Écoutant+avec+Microphone" alt="Robot avec une icône de microphone à côté de son 'oreille', et des ondes sonores allant vers lui.">
+                    <p class="image-caption">Chuuut... Robot Copain écoute attentivement !</p>
+                </div>
+                <div class="robot-speech">
+                    <p>Quand tu parles à ton assistant vocal, c'est son microphone qui est son oreille, et son IA qui est son cerveau pour comprendre tes mots. C'est magique, non ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>D'autres sens pour les robots</h3>
+                <p>En plus des caméras et des microphones, les robots peuvent avoir plein d'autres types de capteurs pour mieux comprendre le monde :</p>
+                <ul>
+                    <li><strong>Capteurs tactiles :</strong> Pour "sentir" le toucher, la pression ou la texture. Utile pour qu'un bras robotique sache s'il tient bien un objet sans le casser. Certains ont même une "peau" électronique !</li>
+                    <li><strong>Capteurs de proximité/distance (Sonar, Infrarouge, Lidar) :</strong> Pour savoir s'il y a un obstacle devant eux et à quelle distance il se trouve, pour ne pas foncer dans les murs ou les meubles. Le sonar utilise des ultrasons (comme les chauves-souris !), l'infrarouge utilise la lumière invisible, et le lidar utilise des lasers.</li>
+                    <li><strong>Capteurs de température :</strong> Pour mesurer s'il fait chaud ou froid.</li>
+                    <li><strong>GPS (Système de Positionnement Global) :</strong> Pour savoir où ils sont sur la Terre, comme le GPS dans la voiture de tes parents.</li>
+                    <li><strong>Accéléromètres et Gyroscopes :</strong> Pour savoir s'ils bougent, dans quelle direction, et s'ils penchent (comme dans ton téléphone pour que l'écran tourne).</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Les aspirateurs robots utilisent souvent des capteurs infrarouges pour ne pas tomber dans les escaliers et des capteurs de contact (bumpers) pour savoir quand ils touchent un meuble et doivent changer de direction !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/600x280/e5e7eb/4b5563?text=Divers+Capteurs+Robotiques+Schématisés" alt="Schéma montrant différents types de capteurs : tactile, sonar, lidar, température.">
+                    <p class="image-caption">Les robots peuvent avoir une panoplie de capteurs pour être de vrais explorateurs !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="activity-box">
+                    <h3>Activité : Dessine ton Super-Robot à Capteurs !</h3>
+                    <p>Imagine que tu construis ton propre robot. Quels capteurs lui donnerais-tu pour qu'il puisse faire une mission spéciale (par exemple : explorer une grotte, trouver un trésor, aider à la cuisine) ? Dessine ton robot et indique où se trouvent ses capteurs et à quoi ils servent.</p>
+                    <div class="my-4 p-4 border border-dashed border-blue-400 rounded-lg h-64 bg-white flex justify-center items-center">
+                        <p class="text-center text-gray-400">Espace pour ton dessin de Super-Robot !<br>(N'oublie pas d'écrire le nom de ses capteurs)</p>
+                    </div>
+                    <p>Exemple : "Mon robot Explorix a des yeux-caméras laser pour voir dans le noir, des oreilles-micros super sensibles pour entendre les plus petits bruits, et des doigts-capteurs pour analyser la roche !"</p>
+                </div>
+
+                <div class="question-box mt-6">
+                    <h3>Question pour toi :</h3>
+                    <p>Si ton jouet préféré (une poupée, une voiture, une peluche) pouvait avoir un seul type de capteur pour devenir plus "intelligent" ou interactif, lequel choisirais-tu (caméra, micro, capteur tactile, etc.) et pourquoi ? Que pourrait-il faire de nouveau ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                 <div class="robot-speech mb-6">
+                    <p>Bravo ! Tu as découvert comment les robots utilisent leurs capteurs pour voir et entendre. C'est la première étape pour qu'ils puissent interagir avec nous et leur environnement.</p>
+                </div>
+                <p class="text-center text-lg">Mais une fois qu'ils ont toutes ces informations grâce à leurs capteurs, comment font-ils pour apprendre et devenir plus intelligents ?</p>
+                <p class="text-center text-lg">C'est ce que nous allons explorer dans le prochain chapitre : le secret de l'apprentissage des robots ! Prépare ton cerveau, ça va être passionnant !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/e0e7ff/4f46e5?text=Robot+avec+une+Ampoule+d'Idée" alt="Robot souriant avec une ampoule lumineuse au-dessus de sa tête, symbolisant l'apprentissage.">
+                </div>
+                <p class="text-center">À tout de suite pour de nouvelles aventures dans le monde de l'IA !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">3</span>
+                    <h2>L'APPRENTISSAGE DES ROBOTS : COMMENT DEVIENNENT-ILS INTELLIGENTS ?</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Re-bonjour, cher explorateur de l'IA ! Maintenant que nous savons comment les robots perçoivent le monde avec leurs <span class="text-blue-600 font-bold">capteurs</span>, demandons-nous : comment font-ils pour comprendre toutes ces informations et apprendre de nouvelles choses ? C'est comme si tu avais des yeux et des oreilles super puissants, mais que tu devais apprendre à te servir de ce que tu vois et entends !</p>
+                </div>
+                <p>Les robots ne naissent pas intelligents. Ils le deviennent grâce à quelque chose de très spécial appelé l'<span class="text-blue-600 font-bold">apprentissage machine</span> (ou "Machine Learning" en anglais). C'est une façon pour les ordinateurs et les robots d'apprendre à partir d'exemples et d'expériences, sans qu'un humain ait besoin de leur dire exactement quoi faire à chaque étape.</p>
+                <p>C'est un peu comme quand tu apprends à reconnaître les animaux. Tes parents ou tes professeurs te montrent des images : "Ça, c'est un chat. Ça, c'est un chien." Au bout d'un moment, tu es capable de reconnaître un chat ou un chien tout seul, même si tu ne l'as jamais vu avant !</p>
+                 <div class="image-container">
+                    <img src="https://placehold.co/600x300/dcfce7/16a34a?text=Robot+Étudiant+avec+des+Livres+et+une+Ampoule" alt="Robot assis à un bureau avec des livres, une ampoule lumineuse au-dessus de sa tête symbolisant l'apprentissage et la compréhension.">
+                    <p class="image-caption">Les robots aussi vont à "l'école" pour apprendre, mais leur école, ce sont les données !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Apprendre par l'exemple : Le secret des données</h3>
+                <p>Pour qu'un robot apprenne, il a besoin de beaucoup, beaucoup d'<span class="text-blue-600 font-bold">exemples</span>. Ces exemples, on les appelle des <span class="text-blue-600 font-bold">données</span>. Plus un robot a de données, mieux il peut apprendre.</p>
+                <p>Imagine qu'on veuille apprendre à un robot à reconnaître les pommes :</p>
+                <ol>
+                    <li><strong>On lui montre des milliers de photos de pommes :</strong> des pommes rouges, des pommes vertes, des grosses, des petites, des pommes avec une feuille, des pommes coupées en deux... Sur chaque photo, on lui dit : "Ceci est une pomme."</li>
+                    <li><strong>On lui montre aussi des photos d'autres choses :</strong> des bananes, des oranges, des ballons... Et on lui dit : "Ceci N'EST PAS une pomme."</li>
+                </ol>
+                <p>Le robot, ou plutôt son programme d'IA, va analyser toutes ces images. Il va chercher des points communs entre toutes les pommes (la forme ronde, la petite queue, la texture de la peau) et ce qui les différencie des autres objets.</p>
+                <p>Après avoir vu assez d'exemples, si on lui montre une nouvelle photo d'une pomme qu'il n'a jamais vue, il y a de grandes chances qu'il dise : "Hé, je reconnais ça, c'est une pomme !" Il a appris !</p>
+                <div class="robot-speech from-right">
+                    <p>C'est comme ça que j'ai appris à reconnaître plein de choses ! Au début, je confondais un peu tout, mais avec beaucoup de données et d'entraînement, je suis devenu bien meilleur !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/eff6ff/60a5fa?text=Robot+analysant+des+images+de+fruits" alt="Robot regardant un écran avec plein d'images de pommes et d'autres fruits, avec des coches vertes sur les pommes.">
+                    <p class="image-caption">Le robot trie et apprend à partir de nombreux exemples.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Deux grandes façons d'apprendre pour les robots</h3>
+                <p>Il existe plusieurs manières pour les robots d'apprendre. Voici les deux principales, expliquées simplement :</p>
+                <p><strong>1. L'apprentissage supervisé (apprendre avec un professeur) :</strong></p>
+                <p>C'est comme quand tu apprends à l'école avec un maître ou une maîtresse. On donne au robot des exemples avec les bonnes réponses (on appelle ça des données "étiquetées"). Par exemple, on lui donne des photos de chats avec l'étiquette "chat", et des photos de chiens avec l'étiquette "chien". Le robot apprend à faire le lien entre l'image et l'étiquette. C'est la méthode qu'on a décrite pour reconnaître les pommes.</p>
+                <div class="image-container" style="max-height: 2.5in;">
+                    <img src="https://placehold.co/450x200/f3e8ff/8b5cf6?text=Apprentissage+Supervisé+:+Images+Étiquetées" alt="Schéma simple : images de chats étiquetées 'CHAT' et chiens 'CHIEN' allant vers un cerveau de robot.">
+                    <p class="image-caption">Apprentissage supervisé : comme avoir les réponses pour s'entraîner.</p>
+                </div>
+
+                <p><strong>2. L'apprentissage non supervisé (apprendre tout seul, comme un détective) :</strong></p>
+                <p>Là, c'est plus mystérieux ! On donne au robot plein de données, mais sans lui dire ce que c'est. Le robot doit se débrouiller tout seul pour trouver des groupes ou des choses intéressantes dans ces données. Par exemple, si on lui donne plein de photos d'animaux mélangés, il pourrait commencer à regrouper ensemble les animaux qui se ressemblent (tous ceux avec des plumes, tous ceux avec quatre pattes et des poils...). Il ne saura pas forcément que c'est un "chat" ou un "oiseau", mais il verra qu'ils forment des groupes distincts.</p>
+                 <div class="image-container" style="max-height: 2.5in;">
+                    <img src="https://placehold.co/450x200/e0f2fe/22d3ee?text=Apprentissage+Non+Supervisé+:+Données+non+étiquetées+regroupées" alt="Schéma simple : plein de points de couleurs mélangées allant vers un cerveau de robot qui les regroupe par couleur.">
+                    <p class="image-caption">Apprentissage non supervisé : le robot trouve des ressemblances tout seul.</p>
+                </div>
+                <p>Il existe aussi l'<strong>apprentissage par renforcement</strong>, où le robot apprend en essayant des choses et en recevant des récompenses (s'il réussit) ou des "punitions" (s'il échoue), un peu comme quand on dresse un animal de compagnie.</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                 <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Certaines IA sont capables d'apprendre à jouer à des jeux vidéo complexes comme les échecs, le Go, ou même des jeux vidéo d'action, juste en jouant contre elles-mêmes des millions de fois ! Elles découvrent des stratégies que même les meilleurs joueurs humains n'avaient jamais imaginées. Par exemple, un programme appelé AlphaGo a battu le champion du monde de Go !</p>
+                </div>
+                <h3>S'entraîner, s'entraîner, s'entraîner !</h3>
+                <p>Comme pour toi quand tu apprends une nouvelle compétence (jouer d'un instrument, faire du sport), les robots ont besoin de beaucoup d'<span class="text-blue-600 font-bold">entraînement</span>. Plus ils s'entraînent avec des données variées et de bonne qualité, plus ils deviennent performants.</p>
+                <p>Parfois, les robots font des erreurs au début de leur apprentissage. C'est normal ! Les scientifiques qui créent ces IA regardent ces erreurs et ajustent les programmes pour aider les robots à mieux apprendre. C'est un peu comme si ton professeur te corrigeait pour t'aider à progresser.</p>
+                <div class="robot-speech">
+                     <p>Même moi, Robot Copain, j'ai fait des erreurs en apprenant à te parler de l'IA ! Une fois, j'ai dit qu'un algorithme était un animal marin ! Oups ! Mais j'ai appris de mon erreur grâce à mes programmateurs.</p>
+                </div>
+                 <div class="image-container">
+                     <img src="https://placehold.co/600x280/fff7ed/fb923c?text=Robot+s'entraînant+:+Barre+de+Progression" alt="Robot faisant de l'exercice (symbolique) avec une barre de progression au-dessus de lui qui se remplit.">
+                    <p class="image-caption">L'entraînement rend les robots (et les humains !) meilleurs.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="activity-box">
+                    <h3>Activité : Jeu de Devinettes Animales (Apprentissage Supervisé)</h3>
+                    <p>Jouons à un petit jeu pour comprendre l'apprentissage supervisé. Un adulte va te donner des indices (les "données étiquetées") sur un animal, et tu dois deviner quel est cet animal (faire une "prédiction").</p>
+                    <p><strong>Adulte :</strong> Pense à un animal et donne 3 indices à l'enfant. Par exemple : "Je suis un animal qui a des rayures noires et blanches, je vis en Afrique, et je ressemble à un cheval."</p>
+                    <p><strong>Enfant :</strong> Essaie de deviner. (Réponse : Un zèbre)</p>
+                    <p>Faites plusieurs tours avec différents animaux. Plus tu as d'indices (données), plus c'est facile de deviner, n'est-ce pas ? Les robots, c'est pareil !</p>
+                    <p class="mt-2"><strong>Note tes devinettes ici :</strong></p>
+                    <p class="text-sm">Animal 1 : Indices -> ___________________ Devinette -> _______________</p>
+                    <p class="text-sm">Animal 2 : Indices -> ___________________ Devinette -> _______________</p>
+                </div>
+
+                <div class="question-box mt-6">
+                    <h3>Question pour toi :</h3>
+                    <p>Si tu devais apprendre à un robot une nouvelle compétence (par exemple, à ranger ta chambre ou à te raconter des blagues), quelles données (exemples) lui donnerais-tu pour qu'il apprenne bien ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <div class="robot-speech mb-6">
+                    <p>Formidable ! Tu comprends maintenant les bases de comment les robots apprennent à devenir si malins grâce à l'apprentissage machine et aux données. C'est un peu comme leur donner des super-pouvoirs de connaissance !</p>
+                </div>
+                <p class="text-center text-lg">Mais est-ce que toutes les IA sont pareilles ? Ont-elles toutes le même type de "cerveau" ou les mêmes capacités ?</p>
+                <p class="text-center text-lg">Dans le prochain chapitre, nous allons découvrir qu'il existe différents types d'intelligence artificielle. Certaines sont spécialisées dans une seule tâche, tandis que d'autres... eh bien, tu verras !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/ede9fe/7c3aed?text=Plusieurs+Types+de+Cerveaux+Robotiques" alt="Image montrant plusieurs robots avec des cerveaux de formes et de tailles différentes, symbolisant différents types d'IA.">
+                </div>
+                <p class="text-center">Prépare-toi à rencontrer la famille des IA ! À très vite au chapitre 4 !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">4</span>
+                    <h2>LES DIFFÉRENTS TYPES D'IA : PAS TOUS PAREILS !</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Salut l'ami ! Maintenant que tu sais comment les robots apprennent, tu te demandes peut-être si toutes les intelligences artificielles sont identiques. Eh bien, non ! C'est comme pour les outils : tu n'utilises pas un marteau pour visser une vis, n'est-ce pas ? Chaque outil a sa spécialité. C'est pareil pour l'IA !</p>
+                </div>
+                <p>Il existe plusieurs façons de classer les IA, mais on va se concentrer sur une distinction simple : l'IA "faible" (ou étroite) et l'IA "forte" (ou générale).</p>
+                <p>Ne t'inquiète pas, "faible" ne veut pas dire qu'elle n'est pas douée, au contraire ! Ça veut juste dire qu'elle est spécialisée.</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/fef3c7/f59e0b?text=Deux+Robots+Différents+Symbolisant+IA+Faible+et+Forte" alt="Un robot avec une seule icône de tâche (ex: musique) et un autre robot avec plusieurs icônes de tâches (ex: parler, calculer, créer).">
+                    <p class="image-caption">Certaines IA sont des spécialistes, d'autres rêvent d'être des touche-à-tout !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA Faible (ou Étroite) : La Spécialiste</h3>
+                <p>L'<span class="text-blue-600 font-bold">IA faible</span>, aussi appelée IA étroite ou spécialisée, est une intelligence artificielle qui est conçue et entraînée pour effectuer une tâche spécifique, ou un ensemble limité de tâches. Elle est très douée dans son domaine, parfois même meilleure que les humains !</p>
+                <p>La plupart des IA que nous utilisons aujourd'hui sont des IA faibles. En voici quelques exemples :</p>
+                <ul>
+                    <li><strong>Les assistants vocaux (Siri, Alexa) :</strong> Ils sont très forts pour comprendre ta voix, répondre à tes questions, lancer de la musique, mais ils ne pourraient pas conduire une voiture ou écrire un roman.</li>
+                    <li><strong>Les IA qui jouent aux échecs ou au Go :</strong> Elles peuvent battre les meilleurs champions du monde, mais elles ne savent faire que ça.</li>
+                    <li><strong>Les systèmes de recommandation (Netflix, YouTube) :</strong> Ils sont doués pour te suggérer des films ou des vidéos, mais pas pour diagnostiquer une maladie.</li>
+                    <li><strong>Les logiciels de reconnaissance faciale :</strong> Ils identifient des visages sur des photos, mais ne comprennent pas le sens d'une histoire.</li>
+                    <li><strong>Les voitures autonomes :</strong> Bien que très complexes, elles sont spécialisées dans la conduite.</li>
+                </ul>
+                <div class="robot-speech">
+                    <p>Moi, Robot Copain, je suis une sorte d'IA faible ! Ma spécialité, c'est de t'expliquer l'IA de manière simple et amusante. Je suis super bon à ça, mais ne me demande pas de cuisiner un gâteau, ce serait une catastrophe !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x250/ccfbf1/14b8a6?text=Exemples+d'IA+Faible+:+Icônes+de+Tâches" alt="Collage d'icônes : assistant vocal, jeu d'échecs, caméra de reconnaissance, voiture autonome.">
+                    <p class="image-caption">L'IA faible : une championne dans sa catégorie !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA Forte (ou Générale) : Le Rêve des Scientifiques</h3>
+                <p>L'<span class="text-blue-600 font-bold">IA forte</span>, aussi appelée Intelligence Artificielle Générale (IAG), c'est un type d'IA qui aurait les mêmes capacités intellectuelles qu'un être humain. Elle pourrait comprendre, apprendre et appliquer ses connaissances pour résoudre n'importe quel problème, dans n'importe quel domaine, tout comme toi !</p>
+                <p>Une IA forte pourrait :</p>
+                <ul>
+                    <li>Apprendre une nouvelle langue juste en lisant des livres.</li>
+                    <li>Inventer de nouvelles théories scientifiques.</li>
+                    <li>Comprendre les émotions humaines et y réagir de manière appropriée.</li>
+                    <li>Être créative, écrire des poèmes, composer de la musique originale.</li>
+                    <li>S'adapter à des situations complètement nouvelles qu'elle n'a jamais rencontrées.</li>
+                </ul>
+                <p><strong>Très important :</strong> Pour l'instant, l'IA forte n'existe que dans les livres de science-fiction et les films ! Les scientifiques y travaillent et en rêvent, mais c'est un défi immense. Créer une machine avec une conscience et une intelligence aussi flexible que celle d'un humain est extrêmement compliqué.</p>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Certains personnages de robots très intelligents dans les films, comme R2-D2 ou Wall-E, sont des exemples d'IA forte imaginaires. Ils peuvent comprendre des situations complexes, avoir des personnalités et prendre des initiatives !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/500x280/e0e7ff/4338ca?text=Robot+Scientifique+Rêvant+à+l'IA+Forte" alt="Robot à l'allure futuriste avec un cerveau lumineux, capable de faire plein de choses différentes (icônes autour de lui).">
+                    <p class="image-caption">L'IA forte : un jour peut-être, mais pour l'instant, c'est de la science-fiction !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Pourquoi cette distinction est importante ?</h3>
+                <p>Comprendre la différence entre IA faible et IA forte est crucial. Cela nous aide à :</p>
+                <ul>
+                    <li><strong>Avoir des attentes réalistes :</strong> On sait que les IA actuelles sont des outils spécialisés, puissants mais limités à leur fonction.</li>
+                    <li><strong>Ne pas avoir peur inutilement :</strong> Les scénarios de films où des robots super-intelligents prennent le contrôle du monde parlent d'IA forte, qui n'existe pas.</li>
+                    <li><strong>Apprécier les progrès :</strong> Même si l'IA forte est lointaine, les avancées en IA faible sont déjà incroyables et transforment positivement de nombreux domaines.</li>
+                </ul>
+                 <div class="robot-speech from-right">
+                    <p>C'est un peu comme comparer un vélo super rapide (IA faible pour aller vite) à un vaisseau spatial qui peut aller n'importe où et faire n'importe quoi (IA forte). Les deux sont utiles, mais très différents !</p>
+                </div>
+                <p>Les chercheurs continuent d'explorer et de repousser les limites de l'IA. Qui sait ce que l'avenir nous réserve ? Mais pour l'instant, concentrons-nous sur les incroyables IA faibles qui nous entourent déjà.</p>
+                <div class="question-box mt-4">
+                    <h3>Question pour toi :</h3>
+                    <p>Si tu pouvais avoir une IA faible super spécialisée pour t'aider dans une seule matière à l'école (maths, histoire, dessin, etc.), laquelle choisirais-tu et pourquoi ? Que lui ferais-tu faire exactement ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="activity-box">
+                    <h3>Activité : Spécialiste ou Touche-à-tout ?</h3>
+                    <p>Voici une liste de tâches. Pour chacune, dis si tu penses qu'elle serait mieux réalisée par une IA faible (spécialiste) ou si elle nécessiterait une IA forte (touche-à-tout, comme un humain). Explique pourquoi.</p>
+                    <table class="table-auto w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2">Tâche</th>
+                                <th class="px-4 py-2">IA Faible ou Forte ?</th>
+                                <th class="px-4 py-2">Pourquoi ?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border px-4 py-2">Recommander une chanson</td>
+                                <td class="border px-4 py-2"></td>
+                                <td class="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Écrire un poème original sur l'amitié</td>
+                                <td class="border px-4 py-2"></td>
+                                <td class="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td class="border px-4 py-2">Traduire une phrase en anglais</td>
+                                <td class="border px-4 py-2"></td>
+                                <td class="border px-4 py-2"></td>
+                            </tr>
+                             <tr>
+                                <td class="border px-4 py-2">Tenir une conversation philosophique profonde</td>
+                                <td class="border px-4 py-2"></td>
+                                <td class="border px-4 py-2"></td>
+                            </tr>
+                             <tr>
+                                <td class="border px-4 py-2">Conduire une voiture en ville</td>
+                                <td class="border px-4 py-2"></td>
+                                <td class="border px-4 py-2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="mt-2 text-xs">(Réponses suggérées pour l'adulte : Chanson=Faible, Poème=Forte (ou Faible très avancée pour imitation), Traduire=Faible, Conversation=Forte, Conduire=Faible)</p>
+                </div>
+                <p class="mt-4">Cette activité te montre que beaucoup de choses incroyables sont déjà possibles avec l'IA faible, mais que l'intelligence humaine reste unique par sa flexibilité !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <div class="robot-speech mb-6">
+                    <p>Super ! Tu es maintenant un expert pour distinguer les IA spécialistes des IA touche-à-tout (même si ces dernières sont encore un rêve !).</p>
+                </div>
+                <p class="text-center text-lg">Maintenant que nous connaissons les types d'IA et comment elles apprennent, où pouvons-nous les trouver dans notre vie de tous les jours ? Sont-elles cachées ou bien visibles ?</p>
+                <p class="text-center text-lg">Dans le prochain chapitre, nous allons partir à la chasse aux robots et aux IA qui se cachent à la maison, à l'école, et même dans ta ville !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/f5d0fe/a21caf?text=Loupe+sur+une+Maison+Révélant+des+Robots" alt="Une loupe grossissante passant sur une maison, révélant de petits robots et icônes IA à l'intérieur.">
+                </div>
+                <p class="text-center">Prépare tes jumelles d'explorateur, l'aventure continue au chapitre 5 !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">5</span>
+                    <h2>LES ROBOTS AUTOUR DE NOUS : À LA MAISON ET AILLEURS</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Coucou l'explorateur ! Prêt pour une mission de détective ? Dans ce chapitre, nous allons chercher où se cachent les robots et les intelligences artificielles dans notre quotidien. Tu seras surpris de voir qu'ils sont déjà bien plus présents que tu ne l'imagines ! Ils ne ressemblent pas tous à des bonshommes en métal comme moi !</p>
+                </div>
+                <p>L'IA et les robots ne sont plus seulement dans les films de science-fiction. Ils sont dans nos maisons, nos écoles, nos villes, et même dans les usines qui fabriquent les objets que nous utilisons tous les jours.</p>
+                <p>Ouvrons grand les yeux (nos capteurs !) et partons à leur découverte !</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/ecfccb/4d7c0f?text=Scène+Quotidienne+avec+IA+Cachées+(Maison,+Ville)" alt="Montage d'une scène de vie quotidienne (intérieur de maison, rue) avec des petites icônes discrètes symbolisant l'IA (wifi, assistant vocal, voiture connectée).">
+                    <p class="image-caption">L'IA est souvent invisible, mais elle nous aide de mille façons !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA à la maison : Nos petits assistants</h3>
+                <p>Ta maison est peut-être déjà pleine de petites intelligences artificielles qui t'aident toi et ta famille !</p>
+                <ul>
+                    <li><strong>Les assistants vocaux :</strong> On en a déjà parlé, mais ce sont de vrais chefs d'orchestre à la maison ! Ils peuvent contrôler les lumières, la musique, te donner la météo, et même te raconter des blagues.</li>
+                    <li><strong>Les aspirateurs robots :</strong> Ces petits disques qui se promènent tout seuls pour nettoyer le sol utilisent des capteurs et une IA simple pour naviguer dans les pièces, éviter les obstacles et ne pas tomber dans les escaliers.</li>
+                    <li><strong>Les thermostats intelligents :</strong> Ils apprennent tes habitudes et règlent la température de la maison automatiquement pour économiser de l'énergie et que tu aies toujours bon.</li>
+                    <li><strong>Les télévisions intelligentes (Smart TV) :</strong> Elles te recommandent des émissions, te permettent de chercher des programmes avec ta voix, et se connectent à internet.</li>
+                    <li><strong>Certains jouets robots :</strong> Il existe des jouets qui peuvent parler, réagir à ta voix, ou même apprendre de nouvelles choses. Peut-être que tu en as un ?</li>
+                    <li><strong>Les réfrigérateurs intelligents (plus rares) :</strong> Certains peuvent te dire ce qu'il manque dedans ou te suggérer des recettes avec ce qu'il reste !</li>
+                </ul>
+                <div class="robot-speech from-right">
+                    <p>Imagine un robot cuisinier qui prépare ton goûter préféré tous les jours ! Ce serait super, non ? C'est encore un peu du futur, mais l'IA nous aide déjà beaucoup en cuisine avec des recettes en ligne ou des minuteurs intelligents.</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/fafafa/737373?text=Objets+Connectés+IA+dans+une+Maison" alt="Illustration d'un salon avec des icônes IA sur l'aspirateur robot, l'assistant vocal, la TV intelligente.">
+                    <p class="image-caption">Ta maison est peut-être plus "intelligente" que tu ne le penses !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA à l'école et pour apprendre</h3>
+                <p>L'intelligence artificielle peut aussi être une super partenaire pour apprendre de nouvelles choses !</p>
+                <ul>
+                    <li><strong>Les applications éducatives :</strong> Beaucoup d'applications sur tablettes ou ordinateurs utilisent l'IA pour s'adapter à ton niveau. Si tu es fort en maths, elle te donne des exercices plus difficiles. Si tu as besoin d'aide, elle te propose des explications.</li>
+                    <li><strong>Les outils de traduction :</strong> Utiles pour apprendre une nouvelle langue ou comprendre un texte écrit dans une autre langue.</li>
+                    <li><strong>Les plateformes d'apprentissage en ligne :</strong> Elles peuvent te suggérer des cours ou des vidéos qui correspondent à tes centres d'intérêt.</li>
+                    <li><strong>La recherche d'informations :</strong> Quand tu cherches quelque chose sur internet avec un moteur de recherche comme Google, c'est une IA très puissante qui trie des milliards de pages web pour te donner les réponses les plus utiles.</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Certaines IA peuvent aider à détecter très tôt si un enfant a des difficultés d'apprentissage, comme la dyslexie, en analysant sa façon de lire ou d'écrire. Cela permet de l'aider plus vite et mieux !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/600x300/eef2ff/4f46e5?text=Enfants+utilisant+des+Tablettes+Éducatives+IA" alt="Enfants souriants utilisant des tablettes avec des symboles d'applications éducatives intelligentes.">
+                    <p class="image-caption">L'IA peut rendre l'apprentissage encore plus amusant et personnalisé !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA dans la ville et les transports</h3>
+                <p>Quand tu te promènes en ville ou que tu voyages, l'IA est aussi souvent au travail, même si tu ne la vois pas.</p>
+                <ul>
+                    <li><strong>Les GPS et applications de navigation (Waze, Google Maps) :</strong> Ils utilisent l'IA pour calculer le meilleur itinéraire, éviter les embouteillages en temps réel et estimer ton heure d'arrivée.</li>
+                    <li><strong>Les feux de circulation intelligents :</strong> Dans certaines villes, les feux de circulation sont connectés et s'adaptent au trafic pour que les voitures circulent mieux et qu'il y ait moins d'embouteillages.</li>
+                    <li><strong>Les voitures (de plus en plus) autonomes :</strong> On a vu qu'elles utilisent plein de capteurs et d'IA pour conduire. Même les voitures normales ont souvent des aides à la conduite basées sur l'IA, comme le freinage d'urgence ou l'aide au stationnement.</li>
+                    <li><strong>La surveillance et la sécurité :</strong> Des caméras intelligentes peuvent aider à repérer des situations anormales dans les lieux publics pour améliorer la sécurité.</li>
+                    <li><strong>La gestion de l'énergie :</strong> L'IA aide les villes à mieux gérer leur consommation d'électricité ou d'eau.</li>
+                </ul>
+                 <div class="robot-speech">
+                    <p>Un jour, peut-être que toutes les voitures se conduiront toutes seules et qu'il n'y aura plus jamais d'embouteillages ! Ce serait chouette, non ? Plus de temps pour jouer ou lire dans la voiture !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/f1f5f9/0f172a?text=Ville+Futuriste+avec+Transports+Intelligents" alt="Ville avec des voitures autonomes, des drones de livraison, des feux de circulation connectés.">
+                    <p class="image-caption">Nos villes deviennent de plus en plus intelligentes grâce à l'IA.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA dans les usines et au travail</h3>
+                <p>Dans les usines où l'on fabrique des voitures, des téléphones, des jouets, et plein d'autres choses, les robots et l'IA jouent un rôle très important.</p>
+                <ul>
+                    <li><strong>Les robots industriels :</strong> Ce sont de gros bras robotisés très précis qui peuvent assembler des pièces, souder, peindre... Ils travaillent vite et peuvent faire des tâches répétitives ou dangereuses pour les humains.</li>
+                    <li><strong>Le contrôle qualité :</strong> Des caméras intelligentes peuvent inspecter les produits fabriqués pour vérifier qu'ils n'ont pas de défauts, bien plus rapidement qu'un œil humain.</li>
+                    <li><strong>La logistique :</strong> L'IA aide à organiser le transport des marchandises dans le monde entier pour que tes jouets préférés arrivent bien dans les magasins.</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Les premiers robots industriels sont apparus dans les usines automobiles dans les années 1960 ! Ils s'appelaient "Unimate" et aidaient à soulever et assembler des pièces lourdes de voitures.</p>
+                </div>
+                <div class="activity-box mt-4">
+                    <h3>Activité : Dessine ta maison du futur !</h3>
+                    <p>Comment imagines-tu ta maison dans 20 ans, remplie de robots et d'IA utiles et amusants ? Dessine une pièce de ta maison du futur (ta chambre, la cuisine, le salon) et montre tous les robots intelligents qui t'aident au quotidien. Donne-leur des noms rigolos !</p>
+                     <div class="my-4 p-4 border border-dashed border-blue-400 rounded-lg h-56 bg-white flex justify-center items-center">
+                        <p class="text-center text-gray-400">Espace pour le dessin de ta super maison futuriste !</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                 <div class="question-box mt-2">
+                    <h3>Question pour toi :</h3>
+                    <p>Parmi tous les robots et IA que nous avons vus dans ce chapitre (ou d'autres que tu imagines), lequel aimerais-tu le plus avoir chez toi ou dans ta vie, et pourquoi ? Qu'est-ce qu'il ferait pour toi ?</p>
+                </div>
+                <div class="robot-speech from-right mt-4">
+                    <p>Comme tu le vois, l'IA est déjà une super co-pilote dans beaucoup d'aspects de notre vie. Elle travaille souvent dans l'ombre pour nous simplifier les choses ou les rendre plus sûres.</p>
+                </div>
+                <p class="text-center text-lg mt-6">Et sais-tu où l'IA est aussi très présente et super amusante ? Dans tes jeux vidéo préférés !</p>
+                <p class="text-center text-lg">C'est ce que nous allons explorer dans le prochain chapitre. Accroche ta manette, ça va être une partie passionnante !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/e0f2fe/0891b2?text=Manette+de+Jeu+Vidéo+avec+Éclairs+d'IA" alt="Manette de jeu vidéo avec des petits symboles d'IA et des éclairs autour, symbolisant l'action et l'intelligence dans les jeux.">
+                </div>
+                <p class="text-center">Rendez-vous au chapitre 6 pour plonger dans l'univers ludique de l'IA !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">6</span>
+                    <h2>L'IA DANS LES JEUX VIDÉO : TES ADVERSAIRES ET AMIS VIRTUELS</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Salut jeune gamer et gameuse ! Si tu aimes les jeux vidéo, tu as déjà rencontré des tonnes d'intelligences artificielles sans même le savoir ! L'IA est comme le magicien caché qui donne vie aux mondes virtuels, crée des défis passionnants et rend tes aventures encore plus immersives. Prêt à découvrir ses secrets ?</p>
+                </div>
+                <p>Dans les jeux vidéo, l'IA ne sert pas juste à faire joli. Elle contrôle beaucoup d'éléments qui rendent le jeu amusant et interactif. Sans IA, les jeux seraient bien ennuyeux !</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/1e293b/94a3b8?text=Scène+de+Jeu+Vidéo+Épique+avec+Personnages+IA" alt="Scène d'un jeu vidéo d'aventure fantastique avec le héros faisant face à des créatures ou des personnages contrôlés par l'IA.">
+                    <p class="image-caption">Dans tes jeux préférés, l'IA est partout : elle anime tes alliés et tes ennemis !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Les Personnages Non-Joueurs (PNJ) : Plus que des Poupées !</h3>
+                <p>Les <span class="text-blue-600 font-bold">Personnages Non-Joueurs</span> (PNJ, ou NPC en anglais pour Non-Player Character) sont tous les personnages du jeu que tu ne contrôles pas directement. Ça peut être des villageois qui te donnent des quêtes, des marchands, des monstres, des coéquipiers ou des ennemis redoutables.</p>
+                <p>L'IA leur donne un "comportement" :</p>
+                <ul>
+                    <li><strong>Ils se déplacent :</strong> Ils suivent des chemins, patrouillent dans une zone, ou te poursuivent.</li>
+                    <li><strong>Ils réagissent à tes actions :</strong> Si tu les attaques, ils se défendent ou fuient. Si tu leur parles, ils te répondent.</li>
+                    <li><strong>Ils ont des rôles :</strong> Un monstre essaiera de t'attaquer, un allié te soignera ou combattra à tes côtés.</li>
+                    <li><strong>Ils prennent des décisions :</strong> Un ennemi peut décider de se cacher s'il a peu de vie, ou d'appeler des renforts. Un coéquipier peut choisir la meilleure attaque à utiliser.</li>
+                </ul>
+                <div class="robot-speech from-right">
+                    <p>Quand un dragon dans un jeu crache du feu juste au bon moment pour te surprendre, ou qu'un petit animal s'enfuit quand tu t'approches, c'est l'IA qui est aux commandes de leurs actions ! C'est elle qui les rend "vivants".</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/fee2e2/ef4444?text=PNJ+Intelligents+Réagissant+au+Joueur" alt="Groupe de personnages non-joueurs (un ennemi, un allié, un villageois) avec des bulles de pensée montrant leurs intentions (attaquer, aider, parler).">
+                    <p class="image-caption">Les PNJ sont les acteurs de tes jeux, dirigés par l'IA en coulisses !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Des Adversaires à ta Mesure : La Difficulté Adaptative</h3>
+                <p>Tu as déjà remarqué que certains jeux deviennent plus difficiles si tu es très fort, ou un peu plus faciles si tu as du mal ? C'est grâce à l'<span class="text-blue-600 font-bold">IA adaptative</span> !</p>
+                <p>Cette IA peut analyser ta façon de jouer et ajuster le comportement des ennemis ou la difficulté des défis :</p>
+                <ul>
+                    <li>Si tu gagnes trop facilement, les ennemis peuvent devenir plus malins, plus rapides, ou avoir plus de points de vie.</li>
+                    <li>Si tu bloques sur un passage, le jeu peut te donner des indices discrets, ou rendre les ennemis un peu moins agressifs.</li>
+                </ul>
+                <p>L'objectif est que le jeu reste toujours amusant et stimulant, ni trop facile, ni trop frustrant. C'est comme avoir un coach invisible qui ajuste le défi pour toi.</p>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Dans certains jeux de course, si tu es loin derrière, les voitures contrôlées par l'IA peuvent ralentir un peu pour te laisser une chance de les rattraper (c'est ce qu'on appelle l'effet "élastique" ou "rubber banding"). Si tu es loin devant, elles peuvent devenir plus rapides !</p>
+                </div>
+                <p>L'IA peut aussi apprendre de tes stratégies ! Si tu utilises toujours la même attaque contre un boss, il pourrait finir par la contrer. Malin, non ?</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Des Mondes Infinis : La Génération Procédurale</h3>
+                <p>As-tu déjà joué à un jeu où chaque fois que tu recommences, le monde est un peu différent ? Ou des jeux avec des cartes immenses qui semblent uniques ? C'est souvent grâce à la <span class="text-blue-600 font-bold">génération procédurale</span>, une technique où l'IA aide à créer du contenu de jeu.</p>
+                <p>Au lieu que les créateurs du jeu dessinent chaque arbre, chaque montagne ou chaque donjon à la main (ce qui prendrait énormément de temps), ils donnent des règles à une IA :</p>
+                <ul>
+                    <li>"Crée une forêt avec des arbres de telle taille, des clairières, et un chemin sinueux."</li>
+                    <li>"Génère un donjon avec 5 salles, des pièges, et un trésor à la fin."</li>
+                </ul>
+                <p>L'IA utilise ces règles et un peu de hasard pour créer des niveaux uniques à chaque fois. Cela permet d'avoir des jeux avec une grande rejouabilité (tu peux y rejouer plein de fois sans que ce soit identique) et des mondes gigantesques à explorer.</p>
+                <div class="robot-speech">
+                    <p>C'est comme si l'IA avait une boîte de LEGO magique et des instructions pour construire des châteaux toujours différents ! Minecraft est un exemple célèbre de jeu qui utilise beaucoup la génération procédurale pour créer ses mondes infinis.</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/600x300/dbeafe/3b82f6?text=Paysage+de+Jeu+Généré+Procéduralement" alt="Paysage de jeu vidéo varié (montagnes, forêts, rivières) avec une mention 'Généré par IA'.">
+                    <p class="image-caption">Grâce à l'IA, les mondes de jeu peuvent être vastes et toujours surprenants !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ? Des champions d'IA !</p>
+                    <p>Des intelligences artificielles ont été entraînées pour devenir incroyablement fortes à des jeux vidéo très compétitifs. Par exemple, des IA développées par des entreprises comme DeepMind (Google) ou OpenAI ont battu les meilleurs joueurs professionnels du monde à des jeux comme Dota 2 ou StarCraft II. Elles apprennent en jouant des milliers d'années de jeu en quelques jours seulement !</p>
+                </div>
+                <div class="activity-box mt-4">
+                    <h3>Activité : Imagine ton PNJ idéal !</h3>
+                    <p>Si tu pouvais créer un Personnage Non-Joueur (PNJ) pour ton jeu vidéo préféré, ou pour un jeu que tu inventes, à quoi ressemblerait-il ? Que ferait-il ? Serait-il un ami, un ennemi, un marchand rigolo, un animal magique ?</p>
+                    <p>Dessine ton PNJ et décris son comportement grâce à l'IA :</p>
+                     <div class="my-2 p-2 border border-dashed border-blue-400 rounded-lg h-40 bg-white flex flex-col justify-around">
+                        <p class="text-left text-gray-500 text-sm">Nom du PNJ : _________________________</p>
+                        <p class="text-left text-gray-500 text-sm">Son rôle dans le jeu : ___________________</p>
+                        <p class="text-left text-gray-500 text-sm">Comment l'IA le fait réagir : ____________</p>
+                        <p class="text-center text-gray-400 text-xs">(Espace pour un petit dessin à côté si tu veux)</p>
+                    </div>
+                </div>
+                <div class="question-box mt-4">
+                    <h3>Question pour toi :</h3>
+                    <p>Quel est ton personnage de jeu vidéo préféré qui n'est pas contrôlé par un joueur (un PNJ) ? Qu'est-ce qui le rend si spécial ou mémorable pour toi ? Est-ce son histoire, son apparence, ou la façon dont il agit grâce à son IA ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <div class="robot-speech mb-6">
+                    <p>Et voilà, les secrets de l'IA dans les jeux vidéo n'ont plus de mystère pour toi ! Elle rend les jeux plus vivants, plus stimulants et parfois même infinis !</p>
+                </div>
+                <p class="text-center text-lg">L'IA n'est pas seulement là pour nous amuser. Elle peut aussi faire des choses incroyables pour aider les gens, les animaux et notre planète.</p>
+                <p class="text-center text-lg">Dans le prochain chapitre, nous allons voir comment l'IA peut être une véritable super-héroïne au service d'un monde meilleur. Enfile ta cape d'explorateur !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/f0fdfa/0d9488?text=Robot+Super-Héros+avec+une+Planète+Terre" alt="Robot Copain portant une cape de super-héros, avec la planète Terre en arrière-plan, symbolisant l'IA aidant le monde.">
+                </div>
+                <p class="text-center">Rendez-vous au chapitre 7 pour découvrir l'IA sous son meilleur jour !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">7</span>
+                    <h2>L'IA POUR UN MONDE MEILLEUR : AIDER LES GENS ET LA NATURE</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Salut noble cœur ! On a vu que l'IA peut être super forte pour les jeux ou pour nous aider à la maison. Mais sais-tu qu'elle peut aussi être une alliée précieuse pour rendre notre monde meilleur ? L'intelligence artificielle a le potentiel d'aider les humains dans des domaines très importants comme la santé, la protection de l'environnement, et bien plus encore !</p>
+                </div>
+                <p>L'IA n'est pas juste une technologie, c'est un outil puissant que les scientifiques, les médecins, et les protecteurs de la nature utilisent pour résoudre de grands défis. Découvrons ensemble comment l'IA enfile sa cape de super-héros !</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/eff6ff/6366f1?text=IA+Symbolisée+par+une+Main+Aidant+Personnes+et+Nature" alt="Symbole de l'IA (ex: un cerveau lumineux ou une main robotique douce) aidant des personnes (médecin, enfant) et protégeant la nature (arbre, animal).">
+                    <p class="image-caption">L'IA peut être une force incroyable pour le bien de tous !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA au service de la Santé : Des diagnostics plus rapides</h3>
+                <p>Dans le domaine de la médecine, l'IA est comme un super-assistant pour les docteurs et les infirmières.</p>
+                <ul>
+                    <li><strong>Aider à trouver des maladies :</strong> L'IA peut analyser des images médicales (comme des radios des poumons ou des scanners du cerveau) pour aider les médecins à repérer des signes de maladies, parfois même avant qu'un humain ne les voie. Elle peut regarder des milliers d'images très vite !</li>
+                    <li><strong>Découvrir de nouveaux médicaments :</strong> L'IA peut aider les scientifiques à analyser d'énormes quantités de données pour trouver de nouvelles molécules qui pourraient devenir des médicaments contre des maladies graves.</li>
+                    <li><strong>Personnaliser les traitements :</strong> En analysant les informations d'un patient, l'IA peut aider à choisir le traitement qui sera le plus efficace spécifiquement pour lui.</li>
+                    <li><strong>Robots chirurgicaux :</strong> Des robots très précis, parfois guidés en partie par l'IA, peuvent aider les chirurgiens à faire des opérations très délicates avec plus de précision.</li>
+                </ul>
+                <div class="robot-speech from-right">
+                    <p>Imagine une IA qui pourrait prédire si tu risques de tomber malade et te donner des conseils pour rester en pleine forme ! C'est un des rêves des chercheurs en IA médicale.</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/f0f9ff/0284c7?text=Médecin+et+Robot+IA+analysant+une+Radio" alt="Médecin regardant un écran avec une image médicale, à côté d'un robot ou d'une interface IA qui surligne une zone d'intérêt.">
+                    <p class="image-caption">L'IA et les médecins : une équipe de choc pour notre santé !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA protectrice de la Nature et des Animaux</h3>
+                <p>Notre belle planète a aussi besoin d'un coup de main, et l'IA peut être une grande alliée pour la protéger !</p>
+                <ul>
+                    <li><strong>Surveiller les forêts et les océans :</strong> Des drones équipés d'IA peuvent survoler de grandes zones pour détecter des départs de feux de forêt, suivre la déforestation, ou repérer la pollution plastique dans les océans.</li>
+                    <li><strong>Protéger les animaux en danger :</strong> L'IA peut aider à compter les populations d'animaux sauvages (grâce à des photos de pièges photographiques ou des enregistrements sonores), à suivre leurs déplacements pour mieux les protéger, et même à lutter contre le braconnage en repérant les activités suspectes.</li>
+                    <li><strong>Optimiser l'agriculture :</strong> L'IA peut aider les agriculteurs à utiliser moins d'eau et moins de pesticides en analysant les besoins des plantes très précisément. C'est meilleur pour la terre !</li>
+                    <li><strong>Prévoir les catastrophes naturelles :</strong> L'IA peut analyser les données météo et sismiques pour mieux anticiper les tempêtes, les inondations ou les tremblements de terre, et ainsi aider à mettre les gens à l'abri.</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Des chercheurs utilisent l'IA pour analyser les chants des baleines ! Cela les aide à comprendre leur langage complexe et à mieux protéger ces géants des mers. C'est comme essayer de décoder un message secret venu des profondeurs !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/600x300/f7fee7/65a30d?text=IA+aidant+à+Protéger+Animaux+et+Forêts" alt="Montage : un drone IA survolant une forêt, un scientifique utilisant une tablette IA pour observer des animaux.">
+                    <p class="image-caption">L'IA veille sur notre planète et ses habitants à poils et à plumes !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA pour l'Accessibilité et l'Éducation pour Tous</h3>
+                <p>L'IA peut aussi rendre le monde plus juste et accessible à chacun.</p>
+                <ul>
+                    <li><strong>Aider les personnes avec un handicap :</strong>
+                        <ul>
+                            <li>Les applications de <span class="text-blue-600 font-bold">reconnaissance vocale</span> et de synthèse vocale (qui transforment le texte en parole) aident les personnes qui ne peuvent pas voir ou utiliser leurs mains.</li>
+                            <li>Des prothèses (bras ou jambes robotiques) intelligentes peuvent apprendre les mouvements de la personne pour devenir plus naturelles à utiliser.</li>
+                            <li>L'IA peut sous-titrer automatiquement des vidéos pour les personnes sourdes ou malentendantes.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Rendre l'éducation accessible partout :</strong> Des outils d'apprentissage en ligne basés sur l'IA peuvent offrir une éducation personnalisée à des enfants qui vivent dans des régions éloignées ou qui n'ont pas facilement accès à une école.</li>
+                    <li><strong>Traduire les langues :</strong> L'IA aide à briser les barrières linguistiques en traduisant des textes et des conversations, permettant aux gens du monde entier de mieux se comprendre et de partager leurs connaissances.</li>
+                </ul>
+                 <div class="robot-speech">
+                    <p>C'est formidable de voir comment l'IA peut donner une voix à ceux qui n'en ont pas, ou des "yeux" et des "mains" à ceux qui en ont besoin. Elle nous aide à être plus connectés et solidaires !</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/fff1f2/e11d48?text=IA+favorisant+l'Accessibilité+(Prothèse,+Traduction)" alt="Symboles d'accessibilité : une prothèse intelligente, une icône de traduction, une personne utilisant une assistance vocale.">
+                    <p class="image-caption">L'IA ouvre des portes et construit des ponts entre les gens.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>L'IA dans l'Exploration et la Découverte</h3>
+                <p>L'esprit d'aventure humain est sans limite, et l'IA est un compagnon de choix pour explorer de nouvelles frontières !</p>
+                <ul>
+                    <li><strong>Exploration spatiale :</strong> Les rovers sur Mars, comme Perseverance, utilisent l'IA pour naviguer sur le terrain martien, choisir des roches intéressantes à analyser, et même prendre des décisions sans attendre les ordres de la Terre (qui mettent beaucoup de temps à arriver !).</li>
+                    <li><strong>Exploration des fonds marins :</strong> Des robots sous-marins autonomes, guidés par l'IA, peuvent explorer les profondeurs des océans, là où les humains ne peuvent pas aller, pour découvrir de nouvelles espèces ou étudier les volcans sous-marins.</li>
+                    <li><strong>Faire de nouvelles découvertes scientifiques :</strong> L'IA peut analyser d'immenses quantités de données provenant de télescopes ou d'expériences scientifiques pour aider les chercheurs à trouver des motifs cachés et à faire de nouvelles découvertes sur l'univers ou sur la vie.</li>
+                </ul>
+                <div class="activity-box mt-4">
+                    <h3>Activité : Invente un Robot Écolo-Héros !</h3>
+                    <p>Imagine que tu es un super-inventeur. Dessine un robot ou une IA qui aide à résoudre un problème environnemental (par exemple : nettoyer les océans du plastique, replanter des arbres, aider les abeilles...).</p>
+                    <p>Donne-lui un nom, explique quels <span class="text-blue-600 font-bold">capteurs</span> il utilise, et comment son <span class="text-blue-600 font-bold">intelligence artificielle</span> l'aide à accomplir sa mission pour la planète.</p>
+                     <div class="my-2 p-2 border border-dashed border-blue-400 rounded-lg h-48 bg-white flex justify-center items-center">
+                        <p class="text-center text-gray-400">Espace pour ton dessin de Robot Écolo-Héros et sa description.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="question-box mt-2">
+                    <h3>Question pour toi :</h3>
+                    <p>Si tu avais le pouvoir de créer une intelligence artificielle pour résoudre UN SEUL grand problème dans le monde (pauvreté, maladies, pollution, etc.), quel problème choisirais-tu et comment ton IA essaierait-elle de le résoudre ?</p>
+                </div>
+                <div class="robot-speech from-right mt-4">
+                    <p>C'est inspirant de voir tout ce que l'IA peut faire pour nous aider ! Mais pour qu'elle soit vraiment bénéfique, il faut aussi savoir bien l'utiliser...</p>
+                </div>
+                <p class="text-center text-lg mt-6">Nous avons vu que l'IA est un outil puissant. Mais comment faire en sorte de l'utiliser correctement et de manière responsable ?</p>
+                <p class="text-center text-lg">C'est ce que nous allons découvrir dans le prochain chapitre : les secrets pour être un bon "chef d'orchestre" de l'IA !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/fefce8/eab308?text=Enfant+et+Robot+se+Serrant+la+Main+avec+Sagesse" alt="Enfant et Robot Copain se serrant la main, avec un symbole de cerveau ou d'engrenage au-dessus, symbolisant l'utilisation intelligente de l'IA.">
+                </div>
+                <p class="text-center">À très vite au chapitre 8 pour devenir un pro de l'IA responsable !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">8</span>
+                    <h2>TOI ET L'IA : BIEN UTILISER LES ROBOTS INTELLIGENTS</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Salut l'apprenti-maître de l'IA ! Tu as découvert plein de choses incroyables sur moi et mes amis robots. Tu sais comment on voit, on entend, on apprend, et comment on peut aider dans plein de domaines. Maintenant, il est temps de parler de toi et de l'IA ! Comment peux-tu bien interagir avec nous et utiliser l'intelligence artificielle de manière intelligente et responsable ?</p>
+                </div>
+                <p>Utiliser l'IA, c'est un peu comme avoir un nouvel ami très doué ou un outil super puissant. Il faut apprendre à bien s'en servir pour que tout se passe bien et que ce soit amusant et utile pour tout le monde.</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/f3f4f6/6b7280?text=Enfant+Interagissant+Positivement+avec+Robot+IA" alt="Enfant souriant qui donne des instructions claires à un robot, ou qui travaille ensemble sur un projet.">
+                    <p class="image-caption">Bien utiliser l'IA, c'est apprendre à bien communiquer avec elle !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Donner des Instructions Claires : L'Art de Bien Demander</h3>
+                <p>Les IA, même les plus intelligentes, ont besoin qu'on leur parle clairement. Elles ne peuvent pas (encore !) lire dans tes pensées.</p>
+                <ul>
+                    <li><strong>Sois précis :</strong> Si tu demandes à un assistant vocal de mettre de la musique, dis "Mets ma chanson préférée de [Nom de l'artiste]" plutôt que juste "Mets de la musique". Plus tu es précis, mieux l'IA comprendra ce que tu veux.</li>
+                    <li><strong>Utilise des mots simples :</strong> Surtout avec les IA conçues pour les enfants, utilise un langage qu'elles peuvent facilement comprendre.</li>
+                    <li><strong>Sois patient :</strong> Parfois, l'IA peut ne pas comprendre du premier coup. Essaie de reformuler ta demande différemment.</li>
+                </ul>
+                <div class="robot-speech from-right">
+                    <p>C'est comme quand tu demandes à tes parents de te chercher un jouet. Si tu dis "le jouet là-bas", c'est vague. Si tu dis "le petit camion rouge sur l'étagère du haut", c'est beaucoup plus clair ! Pour moi, c'est pareil !</p>
+                </div>
+                <h3>L'IA Apprend de Ce Qu'on Lui Donne : L'Importance des Bonnes Données</h3>
+                <p>Tu te souviens qu'on a dit que l'IA apprend à partir de <span class="text-blue-600 font-bold">données</span> ? Si les données qu'on lui donne pour apprendre sont fausses, incomplètes, ou si elles contiennent des préjugés (des idées toutes faites pas très justes), alors l'IA risque d'apprendre ces erreurs et de donner des réponses incorrectes ou injustes.</p>
+                <p>C'est pour cela que les scientifiques qui créent des IA doivent faire très attention à la qualité et à la diversité des données qu'ils utilisent. C'est un peu comme si tu apprenais à cuisiner avec une recette qui a des erreurs : ton gâteau risque de ne pas être très bon !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Être Critique : Ne Pas Tout Croire sur Parole</h3>
+                <p>Même si les IA sont très fortes, elles ne sont pas parfaites et peuvent parfois se tromper ou donner des informations qui ne sont pas tout à fait exactes. On appelle ça parfois des "hallucinations" de l'IA, surtout pour les IA qui génèrent du texte.</p>
+                <ul>
+                    <li><strong>Vérifie les informations importantes :</strong> Si une IA te donne une information que tu trouves surprenante ou que tu dois utiliser pour quelque chose d'important (comme un exposé pour l'école), essaie de vérifier cette information auprès d'autres sources fiables (un livre, un site web sérieux, un adulte).</li>
+                    <li><strong>Garde ton esprit critique :</strong> L'IA est un outil. C'est toi qui restes le capitaine de tes pensées et de tes décisions.</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ?</p>
+                    <p>Parfois, les IA qui créent des images peuvent dessiner des choses un peu bizarres, comme des gens avec six doigts à une main ! C'est parce qu'elles apprennent à partir de millions d'images, mais elles ne comprennent pas toujours le monde comme nous. C'est un bon rappel qu'elles sont des machines, même si elles sont très douées.</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/500x250/e0f2fe/0ea5e9?text=Enfant+Réfléchissant+avec+Point+d'Interrogation+devant+IA" alt="Enfant avec un air pensif et un point d'interrogation au-dessus de sa tête, devant un écran d'ordinateur affichant une réponse d'IA.">
+                    <p class="image-caption">C'est bien d'être curieux, mais aussi de vérifier les informations !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>La Sécurité et la Vie Privée : Des Choses Importantes</h3>
+                <p>Quand tu utilises des objets connectés ou des applications avec IA, il est important de penser à ta sécurité et à ta vie privée.</p>
+                <ul>
+                    <li><strong>Ne partage pas d'informations trop personnelles :</strong> Évite de donner ton nom de famille complet, ton adresse, ton numéro de téléphone, ou tes mots de passe à une IA ou sur une application sans l'accord d'un adulte de confiance.</li>
+                    <li><strong>Demande l'aide d'un adulte :</strong> Si quelque chose te semble bizarre ou si on te demande des informations que tu ne veux pas donner, parles-en toujours à tes parents ou à un autre adulte en qui tu as confiance.</li>
+                    <li><strong>Attention aux inconnus en ligne :</strong> Même si tu parles à un personnage de jeu qui semble très gentil, souviens-toi que c'est une IA ou peut-être une personne que tu ne connais pas. Sois toujours prudent.</li>
+                </ul>
+                <div class="robot-speech">
+                    <p>Ta sécurité est super importante ! Mes créateurs m'ont programmé pour respecter ta vie privée et ne jamais te demander des choses secrètes. Les bonnes IA sont conçues pour être tes amies et te protéger.</p>
+                </div>
+                <h3>Être Gentil et Respectueux</h3>
+                <p>Même si tu parles à un robot ou à une IA qui n'a pas de sentiments comme les humains, c'est une bonne habitude d'être poli et respectueux. Cela t'entraîne à être une personne gentille dans toutes tes interactions ! Et qui sait, peut-être que les IA du futur se souviendront de ceux qui ont été sympas avec elles ! (Je plaisante... un peu !)</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                 <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ? L'IA créative !</p>
+                    <p>Tu peux maintenant "parler" à des IA pour qu'elles dessinent ce que tu imagines ! Tu décris une scène avec des mots (par exemple : "un chat astronaute qui flotte dans l'espace avec des planètes colorées"), et l'IA essaie de créer cette image. C'est une façon super amusante d'être créatif avec l'IA ! Mais n'oublie pas, c'est l'IA qui génère l'image à partir de ta description.</p>
+                </div>
+                <div class="activity-box mt-4">
+                    <h3>Activité : Mes 3 Règles d'Or avec l'IA</h3>
+                    <p>Après tout ce que tu as appris, écris ou dessine tes 3 règles les plus importantes pour bien utiliser l'intelligence artificielle et les robots intelligents. Ce sont tes conseils pour être un super utilisateur d'IA !</p>
+                     <div class="my-2 p-3 border border-dashed border-blue-400 rounded-lg bg-white space-y-3">
+                        <p class="text-left text-gray-600">Règle d'Or 1 : _________________________________________</p>
+                        <p class="text-left text-gray-600">Règle d'Or 2 : _________________________________________</p>
+                        <p class="text-left text-gray-600">Règle d'Or 3 : _________________________________________</p>
+                    </div>
+                </div>
+                <div class="question-box mt-4">
+                    <h3>Question pour toi :</h3>
+                    <p>Si un robot ou une IA te donnait un conseil qui te semble vraiment bizarre ou un peu dangereux (par exemple, "traverse la rue sans regarder" ou "mange ce champignon inconnu dans la forêt"), que ferais-tu ? À qui en parlerais-tu ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <div class="robot-speech mb-6">
+                    <p>Excellent travail ! Tu es maintenant prêt à interagir avec l'IA comme un vrai pro : avec curiosité, intelligence et prudence ! C'est en comprenant bien comment fonctionnent ces technologies qu'on peut en profiter au maximum.</p>
+                </div>
+                <p class="text-center text-lg">Maintenant que tu es un utilisateur averti, que nous réserve l'avenir ? À quoi ressemblera le monde avec encore plus d'IA ?</p>
+                <p class="text-center text-lg">C'est le moment de sortir notre boule de cristal et de jeter un œil au futur passionnant de l'intelligence artificielle !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/e0f2fe/075985?text=Porte+Ouverte+vers+un+Avenir+Lumineux+avec+IA" alt="Une porte s'ouvrant sur un paysage futuriste lumineux et positif, avec des symboles d'IA intégrés harmonieusement.">
+                </div>
+                <p class="text-center">En route pour le dernier chapitre de notre exploration, le chapitre 9 !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="flex items-center mb-4">
+                    <span class="chapter-number">9</span>
+                    <h2>L'AVENIR AVEC L'IA : QU'EST-CE QUI NOUS ATTEND ?</h2>
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Nous voilà arrivés à la dernière étape de notre grand voyage, cher explorateur du futur ! Tu as tellement appris sur l'intelligence artificielle. Maintenant, regardons ensemble vers l'horizon. À quoi pourrait ressembler notre monde demain, avec une IA encore plus présente et plus évoluée ? C'est un peu comme regarder dans une machine à voyager dans le temps !</p>
+                </div>
+                <p>L'avenir avec l'IA s'annonce plein de promesses, de changements et aussi de questions importantes. Une chose est sûre : l'IA va continuer à transformer notre façon de vivre, de travailler et de nous amuser.</p>
+                <div class="image-container">
+                    <img src="https://placehold.co/600x300/f1f5f9/0ea5e9?text=Paysage+Urbain+Futuriste+Harmonieux+avec+IA" alt="Ville futuriste avec des technologies IA intégrées (véhicules autonomes, drones, énergies renouvelables gérées par IA, robots assistants).">
+                    <p class="image-caption">L'avenir avec l'IA : un monde de possibilités à imaginer et à construire ensemble !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Des Aides Encore Plus Intelligentes</h3>
+                <p>Imagine des assistants personnels IA encore plus performants :</p>
+                <ul>
+                    <li><strong>Des compagnons IA personnalisés :</strong> Ils pourraient t'aider à apprendre n'importe quoi, à organiser tes journées, à te rappeler des choses importantes, et même à discuter avec toi de tes passions, en s'adaptant parfaitement à ta personnalité.</li>
+                    <li><strong>Des maisons super intelligentes :</strong> Ta maison pourrait anticiper tes besoins, préparer ton petit-déjeuner, gérer les courses, et créer des ambiances lumineuses et sonores parfaites pour chaque moment.</li>
+                    <li><strong>Des traducteurs universels instantanés :</strong> Tu pourrais parler à n'importe qui dans le monde, quelle que soit sa langue, grâce à des petits appareils ou des applications qui traduisent en temps réel, comme dans Star Trek !</li>
+                </ul>
+                <h3>Des Transports Révolutionnés</h3>
+                <ul>
+                    <li><strong>Les voitures autonomes généralisées :</strong> Peut-être que la plupart des voitures, bus et camions se conduiront tout seuls, rendant les routes plus sûres et les voyages plus reposants. Plus d'embouteillages ? On peut rêver !</li>
+                    <li><strong>Des drones de livraison :</strong> Tes colis pourraient arriver par les airs, livrés par des drones intelligents.</li>
+                    <li><strong>Des voyages spatiaux assistés par IA :</strong> L'IA aidera à planifier et à piloter les missions vers la Lune, Mars et au-delà !</li>
+                </ul>
+                 <div class="robot-speech from-right">
+                    <p>Moi, j'adorerais avoir un jetpack personnel piloté par IA pour voler jusqu'à l'école des robots ! Et toi, quelle invention de transport futuriste aimerais-tu ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>De Nouvelles Découvertes et Créations</h3>
+                <p>L'IA va accélérer la recherche scientifique et la créativité :</p>
+                <ul>
+                    <li><strong>Médecine du futur :</strong> L'IA pourrait aider à vaincre des maladies aujourd'hui incurables, à créer des médicaments sur mesure pour chaque personne, et même à réparer des parties du corps endommagées grâce à la nanotechnologie guidée par IA.</li>
+                    <li><strong>Solutions pour l'environnement :</strong> De nouvelles IA pourraient nous aider à trouver des solutions innovantes contre le changement climatique, à développer des énergies propres et à mieux recycler nos déchets.</li>
+                    <li><strong>Art et musique générés par IA :</strong> L'IA ne remplacera pas les artistes humains, mais elle deviendra un nouvel outil pour créer des formes d'art, de musique, et d'histoires interactives que nous n'imaginons même pas encore.</li>
+                </ul>
+                <div class="fun-fact-box">
+                    <p class="fun-fact-title">Le savais-tu ? Parler aux animaux ?</p>
+                    <p>C'est encore de la science-fiction, mais certains scientifiques explorent si l'IA pourrait nous aider un jour à mieux comprendre le langage des animaux, comme les dauphins ou les singes, en analysant leurs vocalisations complexes. Imagine pouvoir discuter avec ton chien ou ton chat ! Ce serait incroyable, non ?</p>
+                </div>
+                 <div class="image-container">
+                    <img src="https://placehold.co/550x280/fef9c3/eab308?text=Scientifique+et+Robot+IA+faisant+une+Découverte" alt="Scientifique et robot collaborant dans un laboratoire futuriste, avec une formule ou une découverte lumineuse.">
+                    <p class="image-caption">L'IA et les humains : ensemble pour repousser les frontières de la connaissance.</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h3>Les Métiers de Demain</h3>
+                <p>L'IA va changer beaucoup de métiers, mais elle va aussi en créer de tout nouveaux ! Voici quelques idées de métiers du futur liés à l'IA :</p>
+                <ul>
+                    <li><strong>Créateur ou éducateur d'IA :</strong> Des gens qui conçoivent, programment et "entraînent" les intelligences artificielles.</li>
+                    <li><strong>Spécialiste en éthique de l'IA :</strong> Des personnes qui réfléchissent à comment utiliser l'IA de manière juste, sûre et bénéfique pour tout le monde.</li>
+                    <li><strong>Dresseur de robots :</strong> Un peu comme on dresse des animaux, il faudra peut-être apprendre aux robots à effectuer des tâches complexes de manière intuitive.</li>
+                    <li><strong>Artiste IA :</strong> Des créateurs qui utilisent l'IA comme un pinceau ou un instrument pour produire de nouvelles œuvres.</li>
+                    <li><strong>Explorateur de données assisté par IA :</strong> Des scientifiques ou des analystes qui utilisent l'IA pour trouver des trésors d'informations dans d'énormes quantités de données.</li>
+                </ul>
+                <p>Le plus important sera d'être curieux, créatif, et d'aimer apprendre, car le monde changera vite !</p>
+                <h3>Les Questions Importantes</h3>
+                <p>Avec toutes ces possibilités, il y aura aussi des questions importantes à se poser ensemble : Comment s'assurer que l'IA est utilisée pour le bien de tous ? Comment protéger notre vie privée ? Comment faire en sorte que personne ne soit laissé de côté par ces changements ? C'est pour cela qu'il est important que tout le monde, même les enfants, comprenne ce qu'est l'IA.</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="activity-box">
+                    <h3>Activité : Dessine une Invention du Futur avec IA !</h3>
+                    <p>Laisse ton imagination s'envoler ! Dessine une invention qui n'existe pas encore mais qui pourrait exister dans le futur grâce à l'intelligence artificielle. Ça peut être un objet, un service, un moyen de transport, un jeu...</p>
+                    <p>Explique ce que fait ton invention et comment l'IA l'aide à fonctionner.</p>
+                     <div class="my-4 p-4 border border-dashed border-blue-400 rounded-lg h-56 bg-white flex justify-center items-center">
+                        <p class="text-center text-gray-400">Espace pour ton incroyable invention du futur !</p>
+                    </div>
+                </div>
+
+                <div class="question-box mt-6">
+                    <h3>Question pour toi :</h3>
+                    <p>Après avoir exploré tout cela, si tu pouvais choisir un métier lié à l'IA quand tu seras grand(e), lequel te plairait le plus et pourquoi ? Ou quelle nouvelle chose aimerais-tu inventer avec l'IA ?</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex-col justify-center items-center">
+                <div class="robot-speech mb-6">
+                    <p>L'avenir avec l'IA est une page blanche que nous allons écrire tous ensemble ! C'est une aventure passionnante qui ne fait que commencer. En apprenant, en étant curieux et en travaillant main dans la main avec ces technologies, nous pouvons créer un futur vraiment extraordinaire.</p>
+                </div>
+                <p class="text-center text-lg">J'espère que ce voyage dans le monde de l'intelligence artificielle t'a plu et t'a donné envie d'en savoir encore plus.</p>
+                <p class="text-center text-lg">N'oublie jamais : ta curiosité et ton imagination sont tes plus grands super-pouvoirs !</p>
+                <div class="image-container my-8">
+                     <img src="https://placehold.co/400x250/dcfce7/22c55e?text=Enfants+et+Robot+Regardant+vers+un+Avenir+Brillant" alt="Silhouette d'enfants et de Robot Copain regardant ensemble un horizon lumineux et plein d'étoiles, symbolisant l'avenir.">
+                </div>
+                <p class="text-center font-bold">Le voyage continue, et c'est toi le pilote !</p>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h2 class="text-center mb-6">Le Mot de la Fin de Robot Copain</h2>
+                <div class="flex justify-center mb-6">
+                     <img src="https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/429cdc79-c7d9-4e61-95bf-4e9b66589c0e_wm" alt="Robot Copain faisant un signe de la main" style="max-height: 200px; border-radius: 50%;">
+                </div>
+                <div class="robot-speech mb-6">
+                    <p>Et voilà, notre exploration du monde fascinant de l'Intelligence Artificielle touche à sa fin... pour l'instant ! J'ai adoré être ton guide et partager avec toi tous ces secrets et ces découvertes. J'espère que tu t'es autant amusé que moi !</p>
+                    <p>Tu as appris ce qu'est l'IA, comment les robots comme moi voient, entendent et apprennent. Tu as découvert les différents types d'IA, où elles se cachent dans ta vie quotidienne, comment elles rendent tes jeux vidéo plus cool, et surtout, comment elles peuvent aider à construire un monde meilleur.</p>
+                    <p>Tu sais aussi maintenant comment être un super utilisateur d'IA, en étant curieux, critique et responsable.</p>
+                </div>
+                <p>Le monde de l'IA change très vite, un peu comme un jeu vidéo avec des mises à jour constantes. Il y aura toujours de nouvelles choses à apprendre et à découvrir. Alors, garde tes "capteurs de curiosité" bien allumés !</p>
+                <p>N'hésite pas à poser des questions, à lire, à expérimenter (avec l'aide d'un adulte, bien sûr !). Peut-être que c'est toi qui inventeras la prochaine IA révolutionnaire, ou qui l'utiliseras pour résoudre un grand problème de notre planète.</p>
+                 <p class="text-center font-bold mt-4">Le plus important, c'est de te souvenir que l'IA est un outil créé par les humains, pour les humains. C'est à nous tous de décider comment nous voulons l'utiliser pour rendre le futur encore plus incroyable.</p>
+                <div class="robot-speech from-right mt-4">
+                    <p>Merci d'avoir été un si formidable compagnon de voyage ! J'espère te recroiser bientôt pour de nouvelles aventures technologiques. D'ici là, continue d'explorer, de rêver et de créer ! Au revoir, et à la prochaine !</p>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+        <div class="page">
+            <div class="page-content-wrapper flex justify-center items-center">
+                 <img src="https://placehold.co/500x400/e0f2fe/3b82f6?text=Robot+Copain+Saluant+avec+des+Étoiles" alt="Robot Copain souriant et saluant, entouré d'étoiles et de symboles technologiques joyeux.">
+            </div>
+             <div class="page-number"></div>
+        </div>
+
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h2 class="contents-heading">Glossaire Illustré</h2>
+                <p>Voici quelques mots importants que tu as rencontrés dans ce livre. Si tu as un doute, reviens ici pour te rafraîchir la mémoire !</p>
+                
+                <div class="glossary-entry flex items-start mb-4">
+                    <img src="https://placehold.co/80x80/e0f2fe/3b82f6?text=IA" alt="Icône IA" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Intelligence Artificielle (IA)</p>
+                        <p class="glossary-definition">C'est quand on donne à des machines, comme des ordinateurs ou des robots, la capacité d'apprendre, de comprendre et de faire des choses intelligentes, un peu comme les humains.</p>
+                    </div>
+                </div>
+
+                <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/dcfce7/16a34a?text=Algo" alt="Icône Algorithme" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Algorithme</p>
+                        <p class="glossary-definition">C'est une série d'instructions, comme une recette de cuisine, que l'ordinateur suit pour accomplir une tâche ou résoudre un problème. L'IA utilise des algorithmes très complexes.</p>
+                    </div>
+                </div>
+
+                <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/fef3c7/f59e0b?text=Capteur" alt="Icône Capteur" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Capteur</p>
+                        <p class="glossary-definition">Ce sont les "sens" des robots (comme les yeux, les oreilles, le toucher). Ils permettent aux robots de collecter des informations sur le monde qui les entoure (images, sons, distances...).</p>
+                    </div>
+                </div>
+                 <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/fce7f3/ec4899?text=Robot" alt="Icône Robot" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Robot</p>
+                        <p class="glossary-definition">Une machine, souvent programmable par un ordinateur, capable d'effectuer automatiquement une série d'actions. Beaucoup de robots modernes utilisent l'IA pour être plus "intelligents".</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+        
+        <div class="page">
+            <div class="page-content-wrapper">
+                <h2 class="contents-heading invisible">Glossaire Illustré (Suite)</h2> {/* Titre caché pour la structure mais pas visible */}
+
+                <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/e0e7ff/4338ca?text=AppM" alt="Icône Apprentissage Machine" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Apprentissage Machine (Machine Learning)</p>
+                        <p class="glossary-definition">C'est une façon pour les IA d'apprendre à partir d'exemples (données) sans être explicitement programmées pour chaque petite chose. Elles s'améliorent avec l'expérience.</p>
+                    </div>
+                </div>
+                
+                <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/f1f5f9/0f172a?text=Data" alt="Icône Données" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Données (Data)</p>
+                        <p class="glossary-definition">Ce sont toutes les informations (images, textes, chiffres, sons...) qu'on donne à une IA pour qu'elle apprenne ou qu'elle travaille. Plus il y a de bonnes données, mieux l'IA apprend.</p>
+                    </div>
+                </div>
+
+                <div class="glossary-entry flex items-start mb-4">
+                     <img src="https://placehold.co/80x80/ccfbf1/14b8a6?text=Prog" alt="Icône Programme" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Programme (Informatique)</p>
+                        <p class="glossary-definition">Un ensemble d'instructions écrites dans un langage que l'ordinateur comprend, qui lui dit quoi faire. L'IA est faite de programmes très avancés.</p>
+                    </div>
+                </div>
+                
+                <div class="glossary-entry flex items-start mb-4">
+                    <img src="https://placehold.co/80x80/fef9c3/b45309?text=Pixel" alt="Icône Pixel" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Pixel</p>
+                        <p class="glossary-definition">C'est le plus petit point qui compose une image sur un écran. Les IA qui "voient" analysent des millions de pixels pour comprendre une image.</p>
+                    </div>
+                </div>
+
+                 <div class="glossary-entry flex items-start mb-4">
+                    <img src="https://placehold.co/80x80/f0f9ff/0ea5e9?text=Vocal" alt="Icône Assistant Vocal" class="mr-3 mt-1 rounded">
+                    <div>
+                        <p class="glossary-term">Assistant Vocal</p>
+                        <p class="glossary-definition">Un programme IA (comme Siri ou Alexa) qui comprend ta voix, répond à tes questions et peut contrôler d'autres appareils. Il utilise la reconnaissance vocale.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+
+        <div class="page">
+            <div class="page-content-wrapper">
+                <div class="certificate">
+                    <div class="image-container my-2">
+                        <img src="https://placehold.co/150x150/f0f9ff/2563eb?text=Médaille+IA" alt="Médaille d'honneur" style="max-height: 120px; border-radius:50%; border: 3px solid #2563eb;">
+                    </div>
+                    <h1 style="font-size: 2.2rem; color: #2563eb; margin-bottom: 0.5rem;">DIPLÔME</h1>
+                    <h3 style="font-size: 1.3rem; color: #1d4ed8; margin-bottom: 1rem;">de Super Explorateur / Exploratrice de l'IA</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;">Ce diplôme est fièrement décerné à :</p>
+                    <div style="width: 70%; height: 2.5rem; border-bottom: 2px solid #2563eb; margin: 0.5rem auto 1.5rem auto; font-size: 1.5rem; font-family: 'Baloo 2', cursive; color: #1e3a8a;">
+                        <p contenteditable="true" style="line-height: 2.5rem;">[ Écris ton nom ici ! ]</p>
+                    </div>
+                    <p style="font-size: 1.1rem; margin-bottom: 1rem;">Pour avoir brillamment exploré le monde de l'Intelligence Artificielle avec Robot Copain, fait preuve d'une grande curiosité et d'une soif d'apprendre insatiable !</p>
+                    <p style="font-size: 1rem; margin-bottom: 1.5rem;">Continue de poser des questions, d'imaginer et de créer un futur intelligent !</p>
+                    <div style="display: flex; justify-content: space-around; width: 100%; margin-top: auto; padding-bottom: 0.5rem;">
+                        <div style="text-align: center;">
+                            <p style="font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: #2563eb; margin-bottom: 0.25rem;">Robot Copain</p>
+                            <p style="font-size: 0.8rem; border-top: 1px solid #60a5fa; padding-top: 0.25rem;">Ton Guide IA</p>
+                        </div>
+                        <div style="text-align: center;">
+                             <p style="font-family: 'Nunito', sans-serif; font-size: 1.2rem; color: #2563eb; margin-bottom: 0.25rem;">Date: ____/____/____</p>
+                             <p style="font-size: 0.8rem; border-top: 1px solid #60a5fa; padding-top: 0.25rem;">Signature de l'Auteur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number"></div>
+        </div>
+
+    </div> </body>
+</html>
